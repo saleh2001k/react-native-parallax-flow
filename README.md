@@ -2,6 +2,9 @@
 
 A tiny, dependency-light **parallax `ScrollView`** for React Native.
 
+[![npm](https://img.shields.io/npm/v/react-native-parallax-flow.svg)](https://www.npmjs.com/package/react-native-parallax-flow)
+[![license](https://img.shields.io/badge/license-MIT-8b5cf6.svg)](./LICENSE)
+
 **[📖 Docs & live demos → saleh2001k.github.io/react-native-parallax-flow](https://saleh2001k.github.io/react-native-parallax-flow/)**
 
 ## Demos
@@ -26,22 +29,15 @@ A tiny, dependency-light **parallax `ScrollView`** for React Native.
 
 > Three tiny files. No theme provider, no config, no native code.
 
-> ⚠️ **Status: pre-release.** Not published to npm yet — a few edge cases are
-> still being covered. Until then, install straight from GitHub (below).
-
 ---
 
 ## Install
 
-Not on npm yet — install from GitHub:
-
 ```sh
-npm install github:saleh2001k/react-native-parallax-flow react-native-reanimated
+npm install react-native-parallax-flow react-native-reanimated
 # or
-bun add github:saleh2001k/react-native-parallax-flow react-native-reanimated
+bun add react-native-parallax-flow react-native-reanimated
 ```
-
-Once published: `npm install react-native-parallax-flow react-native-reanimated`.
 
 `react-native-reanimated` is a **peer dependency** (>= 3). Make sure its Babel
 plugin is set up — in Expo SDK 50+ `babel-preset-expo` wires it for you; in a

@@ -235,9 +235,7 @@ export default function Home() {
             {/* Title block. */}
             <ParallaxLayer factor={0.5} style={styles.titleLayer}>
               <View style={{ paddingTop: insets.top + 34 }}>
-                <Text style={styles.overline}>
-                  REACT NATIVE · V0.5.0 PRE-RELEASE
-                </Text>
+                <Text style={styles.overline}>REACT NATIVE · V0.5.0</Text>
                 <Text style={styles.heroTitle}>Parallax{"\n"}Flow</Text>
                 <View style={styles.accentRule} />
                 <Text style={styles.heroSub}>

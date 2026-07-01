@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Emit universal output: CommonJS + the automatic JSX runtime so the
+    // compiled lib also runs outside Metro (Node, Jest). Metro consumers get
+    // the TS source via the "react-native" field instead.
+    "target": "ES2017",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "noEmit": false,
+    "outDir": "lib"
+  }
+}
