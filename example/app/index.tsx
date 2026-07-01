@@ -2,10 +2,11 @@ import React from "react";
 import { Link } from "expo-router";
 import type { Href } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import Svg, {
-  Circle,
   Defs,
   LinearGradient,
+  RadialGradient,
   Rect,
   Stop,
 } from "react-native-svg";
@@ -16,167 +17,179 @@ import {
 } from "react-native-parallax-flow";
 import { FadeInBar } from "../components/Showcase";
 
-const HEADER_HEIGHT = 300;
+const HEADER_HEIGHT = 290;
 
 interface Item {
   href: Href;
-  emoji: string;
-  accent: string;
   title: string;
   subtitle: string;
+  /** Unsplash thumb for image-led screens… */
+  image?: string;
+  /** …or a gradient pair matching the screen's theme. */
+  colors?: [string, string];
 }
 
 interface Section {
+  index: string;
   label: string;
-  blurb: string;
   items: Item[];
 }
 
+const unsplash = (id: string) =>
+  `https://images.unsplash.com/${id}?w=500&q=70`;
+
 const SECTIONS: Section[] = [
   {
+    index: "01",
     label: "Real-world screens",
-    blurb: "Lift these straight into an app.",
     items: [
       {
         href: "/artist",
-        emoji: "🎤",
-        accent: "#8b5cf6",
-        title: "Artist page",
-        subtitle: "Video hero, shrinking title, crossfading navbars",
+        title: "Artist",
+        subtitle: "Video hero, crossfading navbars",
+        image: unsplash("photo-1493225457124-a3eb161ffa5f"),
       },
       {
         href: "/profile",
-        emoji: "👤",
-        accent: "#0ea5e9",
-        title: "Social profile",
-        subtitle: "Cover photo, fade-in navbar, stats + photo grid",
+        title: "Profile",
+        subtitle: "Cover photo, fade-in navbar",
+        image: unsplash("photo-1506905925346-21bda4d32df4"),
       },
       {
         href: "/product",
-        emoji: "👟",
-        accent: "#dc2626",
-        title: "Product detail",
-        subtitle: "Docking body, fade-in price bar, sticky cart",
+        title: "Product",
+        subtitle: "Docking body, sticky cart",
+        image: unsplash("photo-1542291026-7eec264c27ff"),
       },
       {
         href: "/playlist",
-        emoji: "💿",
-        accent: "#a855f7",
-        title: "Album playlist",
-        subtitle: "Artwork shrinks and fades, track list",
+        title: "Playlist",
+        subtitle: "Artwork shrinks and fades",
+        image: unsplash("photo-1470225620780-dba8ba36b745"),
       },
       {
         href: "/travel",
-        emoji: "🏝️",
-        accent: "#0891b2",
-        title: "Travel destination",
-        subtitle: "Glass info card, frosted navbar and back button",
+        title: "Travel",
+        subtitle: "Glass card, frosted navbar",
+        image: unsplash("photo-1570077188670-e3a8d69ac5ff"),
       },
       {
         href: "/event",
-        emoji: "🎟️",
-        accent: "#f43f5e",
-        title: "Event tickets",
-        subtitle: "Poster hero, frosted ticket bar over content",
+        title: "Event",
+        subtitle: "Ticket bar scrolls under blur",
+        image: unsplash("photo-1470229722913-7c0e2dbbafd3"),
       },
       {
         href: "/restaurant",
-        emoji: "🍽️",
-        accent: "#d97706",
-        title: "Restaurant menu",
-        subtitle: "Food hero, blur fade-in bar, sectioned menu",
-      },
-    ],
-  },
-  {
-    label: "Showpieces",
-    blurb: "The engine pushed as far as it goes.",
-    items: [
-      {
-        href: "/layers",
-        emoji: "🏔️",
-        accent: "#f97316",
-        title: "Night Ridge",
-        subtitle: "Nine-layer mountain scene with moon and stars",
-      },
-      {
-        href: "/space",
-        emoji: "🪐",
-        accent: "#6366f1",
-        title: "Solar system",
-        subtitle: "Saturn in layered deep space, zooms on pull",
-      },
-      {
-        href: "/magazine",
-        emoji: "📰",
-        accent: "#eab308",
-        title: "Magazine cover",
-        subtitle: "Every cover element on its own depth layer",
+        title: "Restaurant",
+        subtitle: "Sectioned menu, blur bar",
+        image: unsplash("photo-1517248135467-4c7edcad34c4"),
       },
       {
         href: "/boarding-pass",
-        emoji: "✈️",
-        accent: "#0369a1",
         title: "Boarding pass",
-        subtitle: "Perforated edge — sky shows through the teeth",
+        subtitle: "Perforated ticket edge",
+        image: unsplash("photo-1436491865332-7a61a109cc05"),
       },
     ],
   },
   {
-    label: "Fundamentals",
-    blurb: "One prop at a time.",
+    index: "02",
+    label: "Showpieces",
     items: [
       {
-        href: "/content-header",
-        emoji: "📐",
-        accent: "#4f46e5",
-        title: "Auto-height header",
-        subtitle: "Header sizes to content, parallax counter-scroll",
+        href: "/layers",
+        title: "Night Ridge",
+        subtitle: "Nine-layer mountain scene",
+        colors: ["#ff9955", "#17142c"],
       },
       {
-        href: "/fixed-header",
-        emoji: "🔍",
-        accent: "#0f766e",
-        title: "Fixed header + zoom",
-        subtitle: "headerHeight set — pull past the top to zoom",
+        href: "/space",
+        title: "Solar system",
+        subtitle: "Saturn zooms on pull",
+        colors: ["#4c1d95", "#020208"],
+      },
+      {
+        href: "/magazine",
+        title: "Magazine",
+        subtitle: "Cover elements split by depth",
+        image: unsplash("photo-1529626455594-4ff0802cfb7e"),
       },
       {
         href: "/image-header",
-        emoji: "🖼️",
-        accent: "#1f2937",
         title: "Image hero",
-        subtitle: "Floating card body, caption fades on scroll",
+        subtitle: "Floating card, fading caption",
+        image: unsplash("photo-1501785888041-af3ef285b470"),
       },
     ],
   },
   {
-    label: "Tools",
-    blurb: "Poke at the internals.",
+    index: "03",
+    label: "Fundamentals & tools",
     items: [
       {
+        href: "/content-header",
+        title: "Auto height",
+        subtitle: "Header sizes to content",
+        colors: ["#6366f1", "#312e81"],
+      },
+      {
+        href: "/fixed-header",
+        title: "Fixed + zoom",
+        subtitle: "Pull past the top to zoom",
+        colors: ["#14b8a6", "#134e4a"],
+      },
+      {
         href: "/playground",
-        emoji: "🎛️",
-        accent: "#7c3aed",
         title: "Playground",
-        subtitle: "Live-tweak parallaxFactor and header mode",
+        subtitle: "Live-tweak every prop",
+        colors: ["#a78bfa", "#4c1d95"],
       },
       {
         href: "/scroll-to-top",
-        emoji: "🧭",
-        accent: "#b45309",
-        title: "Programmatic scroll",
-        subtitle: "forwardRef → scrollTo from a floating button",
+        title: "Imperative",
+        subtitle: "scrollTo via forwarded ref",
+        colors: ["#f59e0b", "#78350f"],
       },
       {
         href: "/edge-cases",
-        emoji: "🧪",
-        accent: "#be123c",
         title: "Edge cases",
-        subtitle: "factor 0 / 1, short content, empty header",
+        subtitle: "factor 0 / 1, empty header",
+        colors: ["#fb7185", "#881337"],
       },
     ],
   },
 ];
+
+function CardVisual({ item }: { item: Item }) {
+  if (item.image) {
+    return (
+      <View style={styles.visual}>
+        <Image
+          source={item.image}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+          transition={250}
+        />
+        <View style={styles.visualScrim} />
+      </View>
+    );
+  }
+  const [from, to] = item.colors ?? ["#27272a", "#0b0c10"];
+  return (
+    <View style={styles.visual}>
+      <Svg width="100%" height="100%">
+        <Defs>
+          <LinearGradient id={`g-${from}`} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor={from} />
+            <Stop offset="1" stopColor={to} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#g-${from})`} />
+      </Svg>
+    </View>
+  );
+}
 
 /** The home page runs on the library it demos. */
 export default function Home() {
@@ -193,64 +206,37 @@ export default function Home() {
         scrollViewProps={{ showsVerticalScrollIndicator: false }}
         header={
           <View style={styles.hero}>
-            {/* Gradient sky — farthest. */}
-            <ParallaxLayer factor={0.05}>
-              <Svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 100 120"
-                preserveAspectRatio="xMidYMid slice"
-              >
+            {/* Quiet backdrop — charcoal with one soft indigo glow. */}
+            <ParallaxLayer factor={0.08}>
+              <Svg width="100%" height="100%">
                 <Defs>
-                  <LinearGradient id="home" x1="0" y1="0" x2="0.6" y2="1">
-                    <Stop offset="0" stopColor="#1e1b4b" />
-                    <Stop offset="0.55" stopColor="#4c1d95" />
-                    <Stop offset="1" stopColor="#0f1117" />
-                  </LinearGradient>
+                  <RadialGradient id="glow" cx="0.85" cy="0.15" r="0.9">
+                    <Stop offset="0" stopColor="#6d28d9" stopOpacity={0.5} />
+                    <Stop offset="0.55" stopColor="#312e81" stopOpacity={0.18} />
+                    <Stop offset="1" stopColor="#0b0c10" stopOpacity={0} />
+                  </RadialGradient>
                 </Defs>
-                <Rect x="0" y="0" width="100" height="120" fill="url(#home)" />
+                <Rect x="0" y="0" width="100%" height="100%" fill="#0b0c10" />
+                <Rect x="0" y="0" width="100%" height="100%" fill="url(#glow)" />
               </Svg>
             </ParallaxLayer>
 
-            {/* Floating orbs at two depths — the parallax is the pitch. */}
-            <ParallaxLayer factor={0.25}>
-              <Svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 100 120"
-                preserveAspectRatio="xMidYMid slice"
-              >
-                <Circle cx="14" cy="28" r="9" fill="#8b5cf6" opacity={0.35} />
-                <Circle cx="88" cy="52" r="14" fill="#6366f1" opacity={0.28} />
-                <Circle cx="70" cy="16" r="5" fill="#a78bfa" opacity={0.4} />
-              </Svg>
-            </ParallaxLayer>
-            <ParallaxLayer factor={0.55}>
-              <Svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 100 120"
-                preserveAspectRatio="xMidYMid slice"
-              >
-                <Circle cx="30" cy="70" r="4" fill="#c4b5fd" opacity={0.5} />
-                <Circle cx="82" cy="88" r="7" fill="#8b5cf6" opacity={0.45} />
-                <Circle cx="8" cy="98" r="3" fill="#e9d5ff" opacity={0.6} />
-              </Svg>
+            {/* Giant watermark glyph drifting at its own depth. */}
+            <ParallaxLayer factor={0.3} style={styles.watermarkLayer}>
+              <Text style={styles.watermark}>PF</Text>
             </ParallaxLayer>
 
             {/* Title block. */}
-            <ParallaxLayer
-              factor={0.35}
-              style={{ paddingTop: insets.top + 40 }}
-            >
-              <View style={styles.heroContent}>
-                <View style={styles.versionPill}>
-                  <Text style={styles.versionPillText}>v0.5.0 · pre-release</Text>
-                </View>
-                <Text style={styles.heroTitle}>Parallax Flow</Text>
+            <ParallaxLayer factor={0.5} style={styles.titleLayer}>
+              <View style={{ paddingTop: insets.top + 34 }}>
+                <Text style={styles.overline}>
+                  REACT NATIVE · V0.5.0 PRE-RELEASE
+                </Text>
+                <Text style={styles.heroTitle}>Parallax{"\n"}Flow</Text>
+                <View style={styles.accentRule} />
                 <Text style={styles.heroSub}>
-                  Parallax headers · pull-to-zoom · depth layers{"\n"}
-                  scroll-aware overlays · seamless bounce
+                  Scroll-driven headers, depth layers and overlays — on the UI
+                  thread.
                 </Text>
               </View>
             </ParallaxLayer>
@@ -258,8 +244,8 @@ export default function Home() {
         }
         overlay={
           <FadeInBar
-            start={HEADER_HEIGHT - barHeight - 80}
-            end={HEADER_HEIGHT - barHeight - 10}
+            start={HEADER_HEIGHT - barHeight - 70}
+            end={HEADER_HEIGHT - barHeight - 6}
             style={[styles.bar, { height: barHeight, paddingTop: insets.top }]}
           >
             <Text style={styles.barTitle}>Parallax Flow</Text>
@@ -267,39 +253,42 @@ export default function Home() {
         }
       >
         {SECTIONS.map(section => (
-          <View key={section.label} style={styles.section}>
-            <Text style={styles.sectionLabel}>{section.label}</Text>
-            <Text style={styles.sectionBlurb}>{section.blurb}</Text>
-            <View style={styles.cards}>
+          <View key={section.index} style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionIndex}>{section.index}</Text>
+              <Text style={styles.sectionLabel}>{section.label}</Text>
+              <View style={styles.sectionRule} />
+            </View>
+
+            <View style={styles.grid}>
               {section.items.map(item => (
-                <Link key={String(item.href)} href={item.href} asChild>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.card,
-                      pressed && styles.cardPressed,
-                    ]}
-                  >
-                    <View
-                      style={[styles.tile, { backgroundColor: `${item.accent}26` }]}
+                <View key={String(item.href)} style={styles.cell}>
+                  <Link href={item.href} asChild>
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.card,
+                        pressed && styles.cardPressed,
+                      ]}
                     >
-                      <Text style={styles.tileEmoji}>{item.emoji}</Text>
-                    </View>
-                    <View style={styles.cardMain}>
-                      <Text style={styles.cardTitle}>{item.title}</Text>
-                      <Text style={styles.cardSub} numberOfLines={2}>
-                        {item.subtitle}
-                      </Text>
-                    </View>
-                    <Text style={[styles.chev, { color: item.accent }]}>›</Text>
-                  </Pressable>
-                </Link>
+                      <CardVisual item={item} />
+                      <View style={styles.cardBody}>
+                        <Text style={styles.cardTitle} numberOfLines={1}>
+                          {item.title}
+                        </Text>
+                        <Text style={styles.cardSub} numberOfLines={2}>
+                          {item.subtitle}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  </Link>
+                </View>
               ))}
             </View>
           </View>
         ))}
 
         <Text style={styles.footer}>
-          react-native-parallax-flow — MIT · built with reanimated
+          react-native-parallax-flow · MIT · powered by reanimated
         </Text>
         <View style={{ height: insets.bottom + 28 }} />
       </ParallaxScrollView>
@@ -308,86 +297,110 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#0f1117" },
-  header: { backgroundColor: "#1e1b4b" },
+  root: { flex: 1, backgroundColor: "#0b0c10" },
+  header: { backgroundColor: "#0b0c10" },
   hero: { flex: 1 },
-  heroContent: { alignItems: "center", gap: 10, paddingHorizontal: 24 },
-  versionPill: {
-    backgroundColor: "rgba(139,92,246,0.25)",
-    borderWidth: 1,
-    borderColor: "rgba(167,139,250,0.4)",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 14,
+
+  watermarkLayer: { alignItems: "flex-end", justifyContent: "center" },
+  watermark: {
+    fontSize: 210,
+    lineHeight: 210,
+    fontWeight: "900",
+    color: "rgba(255,255,255,0.04)",
+    marginRight: -18,
   },
-  versionPillText: {
-    color: "#c4b5fd",
-    fontSize: 11,
+
+  titleLayer: { paddingHorizontal: 26 },
+  overline: {
+    color: "#8b8b9e",
+    fontSize: 10.5,
     fontWeight: "700",
-    letterSpacing: 0.5,
+    letterSpacing: 2.5,
   },
-  heroTitle: { color: "#ffffff", fontSize: 38, fontWeight: "900" },
+  heroTitle: {
+    color: "#ffffff",
+    fontSize: 52,
+    lineHeight: 54,
+    fontWeight: "900",
+    letterSpacing: -1,
+    marginTop: 10,
+  },
+  accentRule: {
+    width: 44,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: "#8b5cf6",
+    marginTop: 14,
+  },
   heroSub: {
-    color: "#a5b4fc",
-    fontSize: 13,
+    color: "#9d9dae",
+    fontSize: 13.5,
     lineHeight: 20,
-    textAlign: "center",
-    fontWeight: "500",
+    marginTop: 12,
+    maxWidth: 280,
   },
 
   body: {
     backgroundColor: "#0f1117",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.07)",
   },
 
   bar: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(15,17,23,0.97)",
+    backgroundColor: "rgba(11,12,16,0.97)",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#27272a",
   },
   barTitle: { color: "#ffffff", fontSize: 16, fontWeight: "800" },
 
-  section: { paddingHorizontal: 18, paddingTop: 26 },
+  section: { paddingTop: 30, paddingHorizontal: 16 },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 4,
+  },
+  sectionIndex: { color: "#8b5cf6", fontSize: 12, fontWeight: "800" },
   sectionLabel: {
-    color: "#e4e4e7",
-    fontSize: 13,
+    color: "#e7e7ec",
+    fontSize: 12.5,
     fontWeight: "800",
     letterSpacing: 2,
     textTransform: "uppercase",
   },
-  sectionBlurb: { color: "#71717a", fontSize: 12.5, marginTop: 2 },
-  cards: { gap: 10, marginTop: 14 },
+  sectionRule: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: "rgba(255,255,255,0.12)",
+  },
+
+  grid: { flexDirection: "row", flexWrap: "wrap", marginTop: 14 },
+  cell: { width: "50%", padding: 5 },
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    backgroundColor: "#171a23",
+    backgroundColor: "#14161d",
     borderRadius: 18,
-    padding: 14,
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.05)",
+    borderColor: "rgba(255,255,255,0.06)",
   },
-  cardPressed: { opacity: 0.75, transform: [{ scale: 0.99 }] },
-  tile: {
-    width: 46,
-    height: 46,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
+  cardPressed: { opacity: 0.75, transform: [{ scale: 0.98 }] },
+  visual: { height: 92 },
+  visualScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(11,12,16,0.18)",
   },
-  tileEmoji: { fontSize: 22 },
-  cardMain: { flex: 1, gap: 2 },
-  cardTitle: { color: "#fafafa", fontSize: 15, fontWeight: "700" },
-  cardSub: { color: "#8e8e99", fontSize: 12, lineHeight: 17 },
-  chev: { fontSize: 24, fontWeight: "400" },
+  cardBody: { padding: 12, gap: 3 },
+  cardTitle: { color: "#fafafa", fontSize: 14.5, fontWeight: "700" },
+  cardSub: { color: "#84848f", fontSize: 11.5, lineHeight: 16 },
 
   footer: {
-    color: "#52525b",
-    fontSize: 12,
+    color: "#4b4b55",
+    fontSize: 11.5,
     textAlign: "center",
-    paddingTop: 34,
+    paddingTop: 36,
   },
 });
