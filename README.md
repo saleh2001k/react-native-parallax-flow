@@ -2,6 +2,17 @@
 
 A tiny, dependency-light **parallax `ScrollView`** for React Native.
 
+**[📖 Docs & live demos → saleh2001k.github.io/react-native-parallax-flow](https://saleh2001k.github.io/react-native-parallax-flow/)**
+
+## Demos
+
+| Artist page | Social profile | Magazine cover | Night Ridge |
+| :---: | :---: | :---: | :---: |
+| ![Artist page — video hero, crossfading navbars](docs/media/artist.gif) | ![Social profile — cover photo, fade-in navbar](docs/media/profile.gif) | ![Magazine cover — depth-split layers](docs/media/magazine.gif) | ![Night Ridge — nine-layer mountain scene](docs/media/layers.gif) |
+| Video hero, shrinking title, crossfading navbars | Cover photo, fade-in navbar, pull-to-zoom | Every cover element on its own depth layer | Nine-layer SVG mountain scene |
+
+*(GIFs are sped up 2×. Full tour + more demos on the [docs site](https://saleh2001k.github.io/react-native-parallax-flow/).)*
+
 - 🪂 **Header parallax** — the header eases away slower than the body as you scroll.
 - 🔍 **Pull-to-zoom** — give the header a fixed height and it zooms in on over-scroll.
 - 🧊 **Body slides over** — the content body scrolls up _on top of_ the header (great for the rounded-sheet look).

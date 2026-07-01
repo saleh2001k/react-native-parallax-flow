@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>react-native-parallax-flow — parallax headers for React Native</title>
+<meta name="description" content="A tiny parallax ScrollView for React Native — header parallax, pull-to-zoom, depth layers, scroll-aware overlays, seamless bounce. Powered by Reanimated." />
+<style>
+  :root {
+    --bg: #0b0c10;
+    --panel: #14161d;
+    --panel-2: #171a23;
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #f4f4f5;
+    --muted: #9d9dae;
+    --faint: #6b6b78;
+    --accent: #8b5cf6;
+    --accent-soft: rgba(139, 92, 246, 0.16);
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(11, 12, 16, 0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex; align-items: center; gap: 22px;
+    height: 56px; max-width: 1080px; margin: 0 auto; padding: 0 24px;
+  }
+  .nav-title { font-weight: 800; font-size: 15px; color: var(--text); margin-right: auto; white-space: nowrap; }
+  .nav-title span { color: var(--accent); }
+  nav a.link { color: var(--muted); font-size: 13.5px; font-weight: 600; }
+  nav a.link:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 720px) { nav a.link { display: none; } nav a.link.gh { display: block; } }
+
+  header.hero { padding: 84px 0 60px; position: relative; overflow: hidden; }
+  .hero-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 640px 420px at 82% 0%, rgba(109, 40, 217, 0.35), transparent 65%);
+  }
+  .hero-grid { display: flex; gap: 56px; align-items: center; position: relative; }
+  .hero-copy { flex: 1; min-width: 0; }
+  .overline { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: 2.5px; }
+  h1.title { font-size: clamp(44px, 7vw, 68px); line-height: 1.02; font-weight: 900; letter-spacing: -1.5px; margin: 14px 0 0; }
+  .rule { width: 46px; height: 3px; border-radius: 2px; background: var(--accent); margin: 22px 0; }
+  .tagline { color: var(--muted); font-size: 17px; max-width: 440px; }
+  .install {
+    display: inline-flex; align-items: center; gap: 12px; margin-top: 26px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 18px; font-family: var(--mono); font-size: 13.5px; color: #c4b5fd;
+  }
+  .install b { color: var(--faint); font-weight: 400; }
+  .cta-row { margin-top: 18px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 11px 22px; border-radius: 22px;
+    font-size: 14px; font-weight: 700;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7c3aed; text-decoration: none; }
+  .btn-ghost { border: 1px solid var(--line); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); text-decoration: none; }
+  .badge {
+    display: inline-block; margin-bottom: 4px; padding: 4px 12px; border-radius: 999px;
+    background: var(--accent-soft); border: 1px solid rgba(167, 139, 250, 0.35);
+    color: #c4b5fd; font-size: 11.5px; font-weight: 700; letter-spacing: 0.6px;
+  }
+
+  .phone {
+    border-radius: 34px; overflow: hidden; background: #000;
+    border: 6px solid #1c1c22; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    line-height: 0; flex: 0 0 auto;
+  }
+  .phone video { width: 100%; height: auto; display: block; }
+  .hero-phone { width: 270px; }
+  @media (max-width: 860px) {
+    .hero-grid { flex-direction: column; }
+    .hero-phone { width: 240px; }
+  }
+
+  section { padding: 64px 0; border-top: 1px solid var(--line); }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .sec-index { color: var(--accent); font-weight: 800; font-size: 14px; }
+  h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; }
+  .sec-sub { color: var(--muted); font-size: 15px; margin-bottom: 34px; max-width: 620px; }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 26px; }
+  .shot { text-align: center; }
+  .shot .phone { width: 100%; max-width: 250px; margin: 0 auto; border-radius: 30px; }
+  .shot h3 { font-size: 15.5px; font-weight: 700; margin-top: 14px; }
+  .shot p { color: var(--muted); font-size: 13px; margin-top: 3px; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .feature {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px;
+  }
+  .feature h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feature h3::before { content: "— "; color: var(--accent); }
+  .feature p { color: var(--muted); font-size: 13.5px; }
+
+  pre {
+    background: #0e0f15; border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px; overflow-x: auto; font-family: var(--mono); font-size: 13px;
+    line-height: 1.6; color: #d4d4dc; margin: 18px 0;
+  }
+  code.inline { font-family: var(--mono); font-size: 0.9em; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 1.5px 6px; color: #c4b5fd; }
+  .tok-k { color: #c4b5fd; }
+  .tok-s { color: #86efac; }
+  .tok-c { color: #6b6b78; }
+  .tok-t { color: #93c5fd; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 18px 0 34px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--faint); font-size: 11.5px; letter-spacing: 1.2px; text-transform: uppercase; }
+  td:first-child { font-family: var(--mono); font-size: 12.5px; color: #c4b5fd; white-space: nowrap; }
+  td:nth-child(2) { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  td:last-child { color: var(--muted); }
+  h3.api { font-size: 18px; font-weight: 800; margin-top: 34px; }
+
+  .gotchas li { color: var(--muted); font-size: 14.5px; margin: 10px 0 10px 18px; }
+  .gotchas b { color: var(--text); }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 60px; text-align: center; color: var(--faint); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-title" href="#">parallax<span>-flow</span></a>
+    <a class="link" href="#demos">Demos</a>
+    <a class="link" href="#features">Features</a>
+    <a class="link" href="#quickstart">Quick start</a>
+    <a class="link" href="#api">API</a>
+    <a class="link" href="#recipes">Recipes</a>
+    <a class="link gh" href="https://github.com/saleh2001k/react-native-parallax-flow">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="badge">v0.5.0 · PRE-RELEASE</span>
+      <div class="overline">REACT NATIVE · REANIMATED · NEW ARCHITECTURE</div>
+      <h1 class="title">Parallax<br />Flow</h1>
+      <div class="rule"></div>
+      <p class="tagline">
+        A tiny parallax ScrollView for React Native — header parallax,
+        pull-to-zoom, depth layers, scroll-aware overlays and a seamless
+        bounce. All on the UI thread.
+      </p>
+      <div class="install"><b>$</b> npm install github:saleh2001k/react-native-parallax-flow</div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/saleh2001k/react-native-parallax-flow">View on GitHub</a>
+        <a class="btn btn-ghost" href="#quickstart">Quick start</a>
+      </div>
+    </div>
+    <div class="phone hero-phone">
+      <video src="media/showcases.mp4" autoplay loop muted playsinline></video>
+    </div>
+  </div>
+</header>
+
+<section id="demos">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-index">01</span><h2>Demos</h2></div>
+    <p class="sec-sub">
+      Every screen ships in the <a href="https://github.com/saleh2001k/react-native-parallax-flow/tree/main/example">example app</a> —
+      lift them straight into a project.
+    </p>
+    <div class="gallery">
+      <div class="shot">
+        <div class="phone"><video src="media/artist.mp4" autoplay loop muted playsinline></video></div>
+        <h3>Artist page</h3>
+        <p>Video hero, shrinking title, crossfading navbars</p>
+      </div>
+      <div class="shot">
+        <div class="phone"><video src="media/profile.mp4" autoplay loop muted playsinline></video></div>
+        <h3>Social profile</h3>
+        <p>Cover photo, fade-in navbar, pull-to-zoom</p>
+      </div>
+      <div class="shot">
+        <div class="phone"><video src="media/magazine.mp4" autoplay loop muted playsinline></video></div>
+        <h3>Magazine cover</h3>
+        <p>Every cover element on its own depth layer</p>
+      </div>
+      <div class="shot">
+        <div class="phone"><video src="media/layers.mp4" autoplay loop muted playsinline></video></div>
+        <h3>Night Ridge</h3>
+        <p>Nine-layer SVG mountain scene</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-index">02</span><h2>Features</h2></div>
+    <p class="sec-sub">Three tiny files. No theme provider, no config, no native code.</p>
+    <div class="features">
+      <div class="feature"><h3>Header parallax</h3><p>The header eases away slower than the body as you scroll — set the speed with a single <code class="inline">parallaxFactor</code>.</p></div>
+      <div class="feature"><h3>Pull-to-zoom</h3><p>Give the header a fixed height and it zooms in on over-scroll, top edge pinned, bottom edge glued to the body.</p></div>
+      <div class="feature"><h3>Depth layers</h3><p>Stack <code class="inline">ParallaxLayer</code>s at different speeds to fake depth — skies drift, foregrounds rush.</p></div>
+      <div class="feature"><h3>Scroll-aware overlay</h3><p>An <code class="inline">overlay</code> slot above the scroll content that reads the scroll offset — fade-in navbars in a few lines.</p></div>
+      <div class="feature"><h3>Corners reveal the header</h3><p>Rounded body corners show the header's image behind them (<code class="inline">bodyOverlap</code>), not the screen background.</p></div>
+      <div class="feature"><h3>Seamless iOS bounce</h3><p>The bottom over-scroll region is painted in the body's color (<code class="inline">bounceColor</code>) — the bounce stays, the flash goes.</p></div>
+      <div class="feature"><h3>Animated styles</h3><p><code class="inline">bodyStyle</code> and <code class="inline">headerStyle</code> accept Reanimated animated styles — morph the body as it docks.</p></div>
+      <div class="feature"><h3>UI-thread everything</h3><p>Built on <code class="inline">react-native-reanimated</code> worklets. Works on the New Architecture.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-index">03</span><h2>Quick start</h2></div>
+    <p class="sec-sub">
+      <code class="inline">react-native-reanimated</code> (&ge; 3) is a peer dependency.
+      Not on npm yet — install from GitHub until the edge cases are covered.
+    </p>
+<pre><span class="tok-k">import</span> { ParallaxScrollView } <span class="tok-k">from</span> <span class="tok-s">'react-native-parallax-flow'</span>;
+
+<span class="tok-k">export default function</span> <span class="tok-t">Screen</span>() {
+  <span class="tok-k">return</span> (
+    &lt;<span class="tok-t">ParallaxScrollView</span>
+      headerHeight={280}
+      parallaxFactor={0.5}
+      headerStyle={{ backgroundColor: <span class="tok-s">'#0f766e'</span> }}
+      bodyStyle={{
+        backgroundColor: <span class="tok-s">'#fff'</span>,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+      }}
+      header={&lt;<span class="tok-t">Hero</span> /&gt;}
+    &gt;
+      &lt;<span class="tok-t">YourContent</span> /&gt;
+    &lt;/<span class="tok-t">ParallaxScrollView</span>&gt;
+  );
+}</pre>
+  </div>
+</section>
+
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-index">04</span><h2>API</h2></div>
+
+    <h3 class="api">&lt;ParallaxScrollView /&gt;</h3>
+    <table>
+      <tr><th>Prop</th><th>Type / default</th><th>Description</th></tr>
+      <tr><td>header</td><td>ReactNode</td><td>Content of the parallax header region. Can be null.</td></tr>
+      <tr><td>children</td><td>ReactNode</td><td>The body that slides up over the header.</td></tr>
+      <tr><td>headerHeight</td><td>number · auto</td><td>Fixed header height. Omit to size to content. A fixed height enables pull-to-zoom.</td></tr>
+      <tr><td>parallaxFactor</td><td>number · 0.5</td><td>Fraction of scroll speed the header moves at, clamped to [0, 1]. 1 = keeps pace, 0 = frozen.</td></tr>
+      <tr><td>headerParallax</td><td>boolean · true</td><td>Set false so each ParallaxLayer owns its own motion in multi-layer scenes.</td></tr>
+      <tr><td>headerStyle</td><td>AnimatedStyle</td><td>Style for the header container. Accepts Reanimated animated styles.</td></tr>
+      <tr><td>bodyStyle</td><td>AnimatedStyle</td><td>Style for the body wrapper — background, radius, shadow. Accepts animated styles.</td></tr>
+      <tr><td>overlay</td><td>ReactNode</td><td>Rendered absolutely above the scroll content, inside the parallax context — children can call useParallaxScroll(). Never blocks scrolling.</td></tr>
+      <tr><td>scrollY</td><td>SharedValue&lt;number&gt;</td><td>External shared value mirroring the scroll offset, for screen-level scroll animations.</td></tr>
+      <tr><td>bodyOverlap</td><td>number · from radius</td><td>How many px the body overlaps the header, so rounded corners reveal the header content. Defaults to the body's top corner radius.</td></tr>
+      <tr><td>bounceColor</td><td>ColorValue · from bodyStyle</td><td>Color painted under the body for the bottom over-scroll region — keeps the iOS bounce seamless.</td></tr>
+      <tr><td>contentContainerStyle</td><td>ViewStyle</td><td>Merged into the ScrollView's contentContainerStyle.</td></tr>
+      <tr><td>scrollViewProps</td><td>ScrollViewProps</td><td>Any other ScrollView props. onScroll / scrollEventThrottle / contentContainerStyle are managed internally.</td></tr>
+      <tr><td>ref</td><td>Animated.ScrollView</td><td>Forwarded to the inner ScrollView — scrollTo, scrollToEnd, etc.</td></tr>
+    </table>
+
+    <h3 class="api">&lt;ParallaxLayer /&gt;</h3>
+    <table>
+      <tr><th>Prop</th><th>Type / default</th><th>Description</th></tr>
+      <tr><td>factor</td><td>number · 0.5</td><td>Fraction of scroll speed, [0, 1]. Lower = slower = reads as further away.</td></tr>
+      <tr><td>zoomOnPull</td><td>boolean · false</td><td>Scale the layer up on top over-scroll — best on the nearest layers.</td></tr>
+      <tr><td>zoomReference</td><td>number · 300</td><td>Height the zoom ramp is normalized against — usually the header height.</td></tr>
+      <tr><td>style</td><td>ViewStyle</td><td>Extra style on top of the absolute-fill default.</td></tr>
+      <tr><td>pointerEvents</td><td>· 'none'</td><td>Layers don't eat touches by default.</td></tr>
+    </table>
+
+    <h3 class="api">useParallaxScroll()</h3>
+    <p class="sec-sub" style="margin-top: 10px;">
+      Returns the shared scroll offset (<code class="inline">SharedValue&lt;number&gt;</code>).
+      Available anywhere inside the component — header, overlay, body — for building custom scroll-linked effects.
+    </p>
+  </div>
+</section>
+
+<section id="recipes">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-index">05</span><h2>Recipes</h2></div>
+
+    <h3 class="api">Fade-in navbar</h3>
+    <p class="sec-sub" style="margin-top: 10px;">The classic "title bar appears once the hero scrolls away". Render the bar through <code class="inline">overlay</code> so it can read the offset:</p>
+<pre><span class="tok-k">function</span> <span class="tok-t">FadeInBar</span>({ start, end, children }) {
+  <span class="tok-k">const</span> scrollY = <span class="tok-t">useParallaxScroll</span>();
+  <span class="tok-k">const</span> style = <span class="tok-t">useAnimatedStyle</span>(() =&gt; {
+    <span class="tok-k">const</span> t = <span class="tok-t">interpolate</span>(scrollY.value, [start, end], [0, 1], Extrapolation.CLAMP);
+    <span class="tok-k">return</span> { opacity: t, transform: [{ translateY: (1 - t) * -10 }] };
+  });
+  <span class="tok-k">return</span> &lt;<span class="tok-t">Animated.View</span> style={style}&gt;{children}&lt;/<span class="tok-t">Animated.View</span>&gt;;
+}
+
+&lt;<span class="tok-t">ParallaxScrollView</span> header={&lt;<span class="tok-t">Hero</span> /&gt;} overlay={&lt;<span class="tok-t">FadeInBar</span> start={110} end={200}&gt;…&lt;/<span class="tok-t">FadeInBar</span>&gt;}&gt;
+  &lt;<span class="tok-t">Body</span> /&gt;
+&lt;/<span class="tok-t">ParallaxScrollView</span>&gt;</pre>
+
+    <h3 class="api">Docking body</h3>
+    <p class="sec-sub" style="margin-top: 10px;">Pass your own shared value through <code class="inline">scrollY</code> and morph the body while it scrolls — here the top radius flattens as it docks under the navbar:</p>
+<pre><span class="tok-k">const</span> scrollY = <span class="tok-t">useSharedValue</span>(0);
+<span class="tok-k">const</span> dockStyle = <span class="tok-t">useAnimatedStyle</span>(() =&gt; {
+  <span class="tok-k">const</span> radius = <span class="tok-t">interpolate</span>(scrollY.value, [180, 280], [28, 0], Extrapolation.CLAMP);
+  <span class="tok-k">return</span> { borderTopLeftRadius: radius, borderTopRightRadius: radius };
+});
+
+&lt;<span class="tok-t">ParallaxScrollView</span> headerHeight={380} scrollY={scrollY}
+  bodyStyle={[{ backgroundColor: <span class="tok-s">'#fff'</span> }, dockStyle]} header={&lt;<span class="tok-t">Hero</span> /&gt;}&gt;
+  &lt;<span class="tok-t">Body</span> /&gt;
+&lt;/<span class="tok-t">ParallaxScrollView</span>&gt;</pre>
+
+    <h3 class="api">Multi-layer scene</h3>
+<pre>&lt;<span class="tok-t">ParallaxScrollView</span> headerHeight={600} headerParallax={<span class="tok-k">false</span>}
+  header={
+    &lt;&gt;
+      &lt;<span class="tok-t">ParallaxLayer</span> factor={0.05}&gt;{<span class="tok-c">/* sky — barely moves */</span>}&lt;/<span class="tok-t">ParallaxLayer</span>&gt;
+      &lt;<span class="tok-t">ParallaxLayer</span> factor={0.3}&gt;{<span class="tok-c">/* mountains */</span>}&lt;/<span class="tok-t">ParallaxLayer</span>&gt;
+      &lt;<span class="tok-t">ParallaxLayer</span> factor={0.9} zoomOnPull zoomReference={600}&gt;
+        {<span class="tok-c">/* foreground — nearest, zooms on pull */</span>}
+      &lt;/<span class="tok-t">ParallaxLayer</span>&gt;
+    &lt;/&gt;
+  }&gt;
+  &lt;<span class="tok-t">Body</span> /&gt;
+&lt;/<span class="tok-t">ParallaxScrollView</span>&gt;</pre>
+
+    <h3 class="api">Gotchas</h3>
+    <ul class="gotchas">
+      <li><b>Rounded body corners</b> — the body overlaps the header by its top corner radius, so leave room in the header design: its bottom <code class="inline">bodyOverlap</code> px sit under the body.</li>
+      <li><b>iOS bottom bounce</b> — handled automatically via <code class="inline">bounceColor</code>; pass it explicitly for animated or transparent bodies.</li>
+      <li><b>parallaxFactor is clamped</b> to [0, 1] — passing 2 behaves like 1.</li>
+      <li><b>Short bodies still fill the viewport</b> — the content container uses flexGrow: 1.</li>
+      <li><b>Reanimated's Babel plugin</b> must be enabled or the worklets won't run.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    react-native-parallax-flow · MIT © Saleh Ayman ·
+    <a href="https://github.com/saleh2001k/react-native-parallax-flow">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
