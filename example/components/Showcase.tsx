@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { router } from "expo-router";
+import { BlurView, type BlurTint } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   Extrapolation,
@@ -16,21 +17,92 @@ import Animated, {
 } from "react-native-reanimated";
 import { useParallaxScroll } from "react-native-parallax-flow";
 
-/** Floating translucent back button — showcases hide the native header so the
- *  parallax header can run full-bleed under the status bar. */
-export function BackButton({ tint = "#ffffff" }: { tint?: string }) {
+export type BackVariant = "chip" | "blur" | "solid" | "minimal";
+
+/** Floating back button — showcases hide the native header so the parallax
+ *  header can run full-bleed under the status bar. Four looks:
+ *  - `chip`    dark translucent pill with "‹ Back" (the classic)
+ *  - `blur`    frosted-glass circle (expo-blur)
+ *  - `solid`   opaque circle with a shadow
+ *  - `minimal` bare glyph with a soft text shadow
+ */
+export function BackButton({
+  variant = "chip",
+  tint = "#ffffff",
+  blurTint = "light",
+}: {
+  variant?: BackVariant;
+  tint?: string;
+  blurTint?: BlurTint;
+}) {
   const insets = useSafeAreaInsets();
+  const position = { top: insets.top + 8 } as const;
+
+  if (variant === "chip") {
+    return (
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={12}
+        style={({ pressed }) => [
+          styles.back,
+          styles.backChip,
+          position,
+          pressed && { opacity: 0.6 },
+        ]}
+      >
+        <Text style={[styles.backChipText, { color: tint }]}>‹ Back</Text>
+      </Pressable>
+    );
+  }
+
+  if (variant === "blur") {
+    return (
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={12}
+        style={({ pressed }) => [
+          styles.back,
+          styles.backCircle,
+          position,
+          pressed && { opacity: 0.6 },
+        ]}
+      >
+        <BlurView intensity={45} tint={blurTint} style={StyleSheet.absoluteFill} />
+        <Text style={[styles.backGlyph, { color: tint }]}>‹</Text>
+      </Pressable>
+    );
+  }
+
+  if (variant === "solid") {
+    return (
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={12}
+        style={({ pressed }) => [
+          styles.back,
+          styles.backCircle,
+          styles.backSolid,
+          position,
+          pressed && { opacity: 0.7 },
+        ]}
+      >
+        <Text style={[styles.backGlyph, { color: "#111827" }]}>‹</Text>
+      </Pressable>
+    );
+  }
+
+  // minimal
   return (
     <Pressable
       onPress={() => router.back()}
-      hitSlop={12}
+      hitSlop={16}
       style={({ pressed }) => [
         styles.back,
-        { top: insets.top + 8 },
-        pressed && { opacity: 0.6 },
+        position,
+        pressed && { opacity: 0.5 },
       ]}
     >
-      <Text style={[styles.backText, { color: tint }]}>‹ Back</Text>
+      <Text style={[styles.backMinimal, { color: tint }]}>‹</Text>
     </Pressable>
   );
 }
@@ -107,17 +179,74 @@ export function FadeInBar({
   return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
 }
 
+/**
+ * `FadeInBar` with a frosted-glass background (expo-blur) instead of a solid
+ * fill — the content behind it stays faintly visible through the blur.
+ */
+export function BlurFadeBar({
+  start,
+  end,
+  tint = "light",
+  style,
+  children,
+}: {
+  start: number;
+  end: number;
+  tint?: BlurTint;
+  style?: StyleProp<ViewStyle>;
+  children?: ReactNode;
+}) {
+  return (
+    <FadeInBar start={start} end={end} style={style}>
+      <BlurView intensity={55} tint={tint} style={StyleSheet.absoluteFill} />
+      {children}
+    </FadeInBar>
+  );
+}
+
 const styles = StyleSheet.create({
   back: {
     position: "absolute",
     left: 14,
     zIndex: 10,
+  },
+  backChip: {
     backgroundColor: "rgba(0,0,0,0.28)",
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 20,
   },
-  backText: { fontSize: 15, fontWeight: "700" },
+  backChipText: { fontSize: 15, fontWeight: "700" },
+  backCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backSolid: {
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
+  },
+  backGlyph: {
+    fontSize: 26,
+    fontWeight: "700",
+    lineHeight: 30,
+    marginTop: -3,
+  },
+  backMinimal: {
+    fontSize: 34,
+    fontWeight: "700",
+    lineHeight: 38,
+    textShadowColor: "rgba(0,0,0,0.45)",
+    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 1 },
+  },
   handleWrap: { alignItems: "center", paddingTop: 10 },
   handle: { width: 40, height: 4.5, borderRadius: 3 },
   filler: { padding: 20, gap: 18 },

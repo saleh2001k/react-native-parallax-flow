@@ -80,7 +80,7 @@ export default function Product() {
               </Text>
               <Text style={styles.barPrice}>$139</Text>
             </FadeInBar>
-            <BackButton />
+            <BackButton variant="solid" />
           </>
         }
       >

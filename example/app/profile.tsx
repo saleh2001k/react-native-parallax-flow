@@ -83,7 +83,7 @@ export default function Profile() {
               <Image source={AVATAR} style={styles.barAvatar} contentFit="cover" />
               <Text style={styles.barName}>Maya Chen</Text>
             </FadeInBar>
-            <BackButton />
+            <BackButton variant="blur" blurTint="dark" />
           </>
         }
       >

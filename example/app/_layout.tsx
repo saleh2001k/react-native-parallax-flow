@@ -45,6 +45,18 @@ export default function RootLayout() {
             options={{ title: 'Album playlist', headerShown: false }}
           />
           <Stack.Screen
+            name="travel"
+            options={{ title: 'Travel destination', headerShown: false }}
+          />
+          <Stack.Screen
+            name="event"
+            options={{ title: 'Event tickets', headerShown: false }}
+          />
+          <Stack.Screen
+            name="restaurant"
+            options={{ title: 'Restaurant menu', headerShown: false }}
+          />
+          <Stack.Screen
             name="playground"
             options={{ title: 'Playground', headerShown: false }}
           />

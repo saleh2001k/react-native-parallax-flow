@@ -10,7 +10,7 @@ export default function FixedHeader() {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.root}>
-      <BackButton />
+      <BackButton variant="solid" />
       <ParallaxScrollView
         headerHeight={HEADER_HEIGHT}
         parallaxFactor={0.5}

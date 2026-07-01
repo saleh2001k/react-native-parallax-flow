@@ -8,7 +8,7 @@ export default function ContentHeader() {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.root}>
-      <BackButton />
+      <BackButton variant="minimal" />
       <ParallaxScrollView
         parallaxFactor={0.5}
         headerStyle={styles.header}

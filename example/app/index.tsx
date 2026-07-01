@@ -31,6 +31,24 @@ const ITEMS: Item[] = [
     subtitle: 'Spotify-style artwork header, fade-in bar, track list',
   },
   {
+    href: '/travel',
+    tag: 'real app',
+    title: 'Travel destination',
+    subtitle: 'Glass info card, frosted navbar + blur back button',
+  },
+  {
+    href: '/event',
+    tag: 'real app',
+    title: 'Event tickets',
+    subtitle: 'Poster hero, lineup, frosted ticket bar over content',
+  },
+  {
+    href: '/restaurant',
+    tag: 'real app',
+    title: 'Restaurant menu',
+    subtitle: 'Food hero, blur fade-in bar, sectioned menu',
+  },
+  {
     href: '/content-header',
     tag: 'basics',
     title: 'Auto-height header',

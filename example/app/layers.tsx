@@ -89,7 +89,7 @@ export default function Layers() {
 
   return (
     <View style={styles.root}>
-      <BackButton />
+      <BackButton variant="minimal" />
       <ParallaxScrollView
         headerHeight={headerHeight}
         // Each ParallaxLayer owns its own motion → turn off the container's.

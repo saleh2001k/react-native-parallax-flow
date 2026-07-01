@@ -2,6 +2,7 @@ import React, { forwardRef, type ReactNode } from 'react';
 import {
   View,
   StyleSheet,
+  type ColorValue,
   type ScrollViewProps,
   type StyleProp,
   type ViewStyle,
@@ -17,6 +18,17 @@ import Animated, {
 import { ParallaxScrollContext } from './ParallaxContext';
 
 const DEFAULT_PARALLAX_FACTOR = 0.5;
+// Tall enough that no realistic rubber-band over-scroll out-runs the tail.
+const BOUNCE_TAIL_HEIGHT = 1200;
+
+/** Best-effort backgroundColor from a (possibly animated) body style. */
+function extractBackgroundColor(
+  style: StyleProp<AnimatedStyle<ViewStyle>>,
+): ColorValue | undefined {
+  const flat = StyleSheet.flatten(style as StyleProp<ViewStyle>);
+  const bg = flat?.backgroundColor;
+  return typeof bg === 'string' || typeof bg === 'number' ? bg : undefined;
+}
 
 export type ParallaxScrollViewProps = {
   /** Content rendered inside the parallax header region. */
@@ -78,6 +90,15 @@ export type ParallaxScrollViewProps = {
    * `useParallaxScroll()` instead.
    */
   scrollY?: SharedValue<number>;
+  /**
+   * Color painted beneath the body for the bottom over-scroll (bounce) region.
+   * On iOS, rubber-banding past the bottom reveals whatever sits behind the
+   * scroll content — usually the screen background, which flashes a mismatched
+   * color under the body. Set this to the body's surface color to keep the
+   * bounce seamless (the bounce itself stays enabled). Defaults to the
+   * `backgroundColor` found in a static `bodyStyle`, if any.
+   */
+  bounceColor?: ColorValue;
   children: ReactNode;
 };
 
@@ -104,6 +125,7 @@ export const ParallaxScrollView = forwardRef<
     scrollViewProps,
     overlay,
     scrollY: externalScrollY,
+    bounceColor,
     children,
   },
   ref,
@@ -117,6 +139,8 @@ export const ParallaxScrollView = forwardRef<
   const fixedHeaderHeight =
     headerHeight && headerHeight > 0 ? headerHeight : undefined;
   const factor = Math.min(1, Math.max(0, parallaxFactor));
+
+  const resolvedBounceColor = bounceColor ?? extractBackgroundColor(bodyStyle);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
@@ -177,6 +201,16 @@ export const ParallaxScrollView = forwardRef<
 
           {/* Body rendered after header → higher z-order, slides over header. */}
           <Animated.View layout={LinearTransition} style={[styles.body, bodyStyle]}>
+            {/* Bounce tail: extends the body surface below the content so the
+                iOS bottom rubber-band shows this color instead of whatever is
+                behind the ScrollView. Purely cosmetic — never intercepts
+                touches, never affects layout. */}
+            {resolvedBounceColor != null && (
+              <View
+                pointerEvents="none"
+                style={[styles.bounceTail, { backgroundColor: resolvedBounceColor }]}
+              />
+            )}
             {children}
           </Animated.View>
         </Animated.ScrollView>
@@ -205,5 +239,12 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+  },
+  bounceTail: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -BOUNCE_TAIL_HEIGHT,
+    height: BOUNCE_TAIL_HEIGHT,
   },
 });

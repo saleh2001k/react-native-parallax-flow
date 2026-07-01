@@ -8,6 +8,7 @@ A tiny, dependency-light **parallax `ScrollView`** for React Native.
 - 🏔️ **Multi-layer depth** — stack `ParallaxLayer`s at different speeds for a layered-scene effect.
 - 🎯 **Scroll-aware overlay** — an `overlay` slot above the scroll content that can read the scroll offset, for fade-in navbars and floating controls.
 - 🌀 **Animated styles everywhere** — `headerStyle` / `bodyStyle` accept Reanimated animated styles, and a `scrollY` prop exposes the offset for screen-level scroll animations (docking bodies, morphing radii…).
+- 🫧 **Seamless iOS bounce** — the bottom over-scroll region is painted in the body's color (`bounceColor`), so rubber-banding never flashes the screen background. The bounce itself stays.
 - 🎨 **Fully style-prop driven** — zero opinionated colors. You paint the header and body.
 - 🧵 Runs on the UI thread via [`react-native-reanimated`](https://docs.swmansion.com/react-native-reanimated/). Works on the New Architecture.
 
@@ -100,6 +101,7 @@ export default function Screen() {
 | `scrollViewProps`       | `Omit<ScrollViewProps, 'onScroll' \| 'scrollEventThrottle' \| 'contentContainerStyle'>` | — | Any other ScrollView props (e.g. `showsVerticalScrollIndicator`, `refreshControl`). The omitted props are managed internally. |
 | `overlay`               | `ReactNode`                           | —       | Rendered absolutely **above** the scroll content but inside the parallax context — its children can call `useParallaxScroll()`. Container is `pointerEvents="box-none"`, so it never blocks scrolling. Perfect for fade-in navbars. |
 | `scrollY`               | `SharedValue<number>`                 | —       | Optional external shared value mirroring the scroll offset. Pass your own `useSharedValue(0)` to drive scroll-linked animations **outside** the component tree (e.g. an animated `bodyStyle` built at the screen level). Inside `header` / `overlay` / body children, use `useParallaxScroll()` instead. |
+| `bounceColor`           | `ColorValue`                          | _from `bodyStyle`_ | Color painted under the body for the **bottom over-scroll (bounce)** region. Defaults to the `backgroundColor` found in a static `bodyStyle`. See the gotcha below. |
 | `ref`                   | `Ref<Animated.ScrollView>`            | —       | Forwarded to the inner `Animated.ScrollView` — call `scrollTo`, `scrollToEnd`, etc. |
 
 ---
@@ -299,6 +301,13 @@ ref.current?.scrollTo({ y: 0, animated: true });
 
 ## Edge cases & gotchas
 
+- **iOS bottom bounce** — rubber-banding past the bottom reveals whatever is
+  behind the ScrollView (usually your screen background). If your screen bg is
+  red and your body is white, the bounce flashes red under the white body. The
+  component paints a tall "tail" under the body in `bounceColor` (auto-derived
+  from a static `bodyStyle`'s `backgroundColor`) so the bounce stays seamless —
+  the bounce itself is untouched. Pass `bounceColor` explicitly when the body
+  surface color can't be derived (animated or transparent bodies).
 - **`parallaxFactor` is clamped** to `[0, 1]` — passing `2` behaves like `1`.
 - **`headerHeight={0}`** is treated the same as omitting it (auto mode); a 0-px
   header is never useful.
@@ -319,8 +328,15 @@ interactive playground, programmatic scroll, and edge cases) plus three
 **real-app screens** you can lift straight into a project:
 
 - **Social profile** — cover photo, fade-in navbar, overlapping avatar, stats, photo grid.
-- **Product detail** — image hero, fade-in title/price bar, color + size pickers, sticky add-to-cart.
+- **Product detail** — image hero, fade-in title/price bar, color + size pickers, sticky add-to-cart, docking body.
 - **Album playlist** — Spotify-style artwork that shrinks/fades, gradient scene, fade-in title bar, track list.
+- **Travel destination** — frosted-glass info card on the hero, blur fade-in navbar, blur back button, gallery.
+- **Event tickets** — poster hero, lineup, frosted ticket bar the content scrolls under.
+- **Restaurant menu** — food hero, blur fade-in bar, sectioned menu with dish photos.
+
+The showcases also demo four back-button styles (translucent chip, frosted
+blur circle, solid circle, bare glyph) — see `BackButton` in
+[`example/components/Showcase.tsx`](./example/components/Showcase.tsx).
 
 ```sh
 cd example

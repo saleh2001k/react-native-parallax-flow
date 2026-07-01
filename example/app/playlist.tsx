@@ -91,7 +91,7 @@ export default function Playlist() {
                 Midnight Drive — Violet Motors
               </Text>
             </FadeInBar>
-            <BackButton />
+            <BackButton variant="blur" blurTint="dark" />
           </>
         }
       >
