@@ -6,16 +6,23 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <Stack
           screenOptions={{
-            headerStyle: { backgroundColor: '#f9fafb' },
-            headerTintColor: '#111827',
+            headerStyle: { backgroundColor: '#0f1117' },
+            headerTintColor: '#fafafa',
             headerTitleStyle: { fontWeight: '700' },
-            contentStyle: { backgroundColor: '#f9fafb' },
+            contentStyle: { backgroundColor: '#0f1117' },
           }}
         >
-          <Stack.Screen name="index" options={{ title: 'Parallax Flow' }} />
+          <Stack.Screen
+            name="index"
+            options={{ title: 'Parallax Flow', headerShown: false }}
+          />
+          <Stack.Screen
+            name="artist"
+            options={{ title: 'Artist page', headerShown: false }}
+          />
           <Stack.Screen
             name="content-header"
             options={{ title: 'Auto-height header', headerShown: false }}

@@ -333,6 +333,7 @@ showcases for every mode (auto header, fixed header + zoom, image hero, an
 interactive playground, programmatic scroll, and edge cases) plus three
 **real-app screens** you can lift straight into a project:
 
+- **Artist page** — muted video hero (expo-video), a big title that shrinks away, and two navbars crossfading (floating controls out, solid title bar in).
 - **Social profile** — cover photo, fade-in navbar, overlapping avatar, stats, photo grid.
 - **Product detail** — image hero, fade-in title/price bar, color + size pickers, sticky add-to-cart, docking body.
 - **Album playlist** — Spotify-style artwork that shrinks/fades, gradient scene, fade-in title bar, track list.

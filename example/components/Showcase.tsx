@@ -180,6 +180,41 @@ export function FadeInBar({
 }
 
 /**
+ * Inverse of `FadeInBar`: fully visible at rest, fades + releases touches as
+ * the scroll passes `start`→`end`. Pair the two through the `overlay` prop to
+ * crossfade an over-the-hero control row into a solid navbar.
+ */
+export function FadeOutView({
+  start,
+  end,
+  style,
+  children,
+}: {
+  /** Scroll offset (px) where the view starts disappearing. */
+  start: number;
+  /** Scroll offset (px) where the view is fully hidden. */
+  end: number;
+  style?: StyleProp<ViewStyle>;
+  children?: ReactNode;
+}) {
+  const scrollY = useParallaxScroll();
+  const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
+    const t = interpolate(
+      scrollY.value,
+      [start, end],
+      [1, 0],
+      Extrapolation.CLAMP,
+    );
+    return {
+      opacity: t,
+      pointerEvents: t > 0.5 ? ("auto" as const) : ("none" as const),
+    };
+  });
+  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
+}
+
+/**
  * `FadeInBar` with a frosted-glass background (expo-blur) instead of a solid
  * fill — the content behind it stays faintly visible through the blur.
  */
