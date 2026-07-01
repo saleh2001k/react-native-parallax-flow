@@ -1,6 +1,6 @@
 {
   "name": "react-native-parallax-flow",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A tiny, dependency-light parallax ScrollView for React Native. Header parallax + pull-to-zoom + a body that slides over the header. Fully style-prop driven, powered by react-native-reanimated.",
   "main": "src/index.ts",
   "types": "src/index.ts",

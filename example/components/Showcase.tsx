@@ -35,27 +35,26 @@ export function BackButton({ tint = "#ffffff" }: { tint?: string }) {
   );
 }
 
-/** Default body styling used across showcases: a card sliding up over the
- *  header, with rounded top corners + a soft shadow (the classic look). */
-export const bodySheetStyle = {
-  backgroundColor: "#ffffff",
-  borderTopLeftRadius: 28,
-  borderTopRightRadius: 28,
-  shadowColor: "#000",
-  shadowOpacity: 0.12,
-  shadowRadius: 12,
-  shadowOffset: { width: 0, height: -4 },
-  elevation: 8,
-} as const;
+/** Centered grab bar for bottom-sheet-style bodies. */
+export function SheetHandle({ color = "#d1d5db" }: { color?: string }) {
+  return (
+    <View style={styles.handleWrap}>
+      <View style={[styles.handle, { backgroundColor: color }]} />
+    </View>
+  );
+}
 
-/** A block of filler paragraphs so there's always something to scroll. */
-export function Filler({ count = 8 }: { count?: number }) {
+/** A block of filler paragraphs so there's always something to scroll.
+ *  `dark` flips the text palette for dark bodies. */
+export function Filler({ count = 8, dark = false }: { count?: number; dark?: boolean }) {
   return (
     <View style={styles.filler}>
       {Array.from({ length: count }).map((_, i) => (
         <View key={i} style={styles.para}>
-          <Text style={styles.paraTitle}>Section {i + 1}</Text>
-          <Text style={styles.paraBody}>
+          <Text style={[styles.paraTitle, dark && styles.paraTitleDark]}>
+            Section {i + 1}
+          </Text>
+          <Text style={[styles.paraBody, dark && styles.paraBodyDark]}>
             Scroll up and down to feel the parallax. The body slides over the
             header while the header eases away more slowly. Pull past the top to
             see fixed headers zoom.
@@ -119,10 +118,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   backText: { fontSize: 15, fontWeight: "700" },
+  handleWrap: { alignItems: "center", paddingTop: 10 },
+  handle: { width: 40, height: 4.5, borderRadius: 3 },
   filler: { padding: 20, gap: 18 },
   para: { gap: 6 },
   paraTitle: { fontSize: 16, fontWeight: "700", color: "#111827" },
+  paraTitleDark: { color: "#f4f4f5" },
   paraBody: { fontSize: 14, lineHeight: 21, color: "#4b5563" },
+  paraBodyDark: { color: "#a1a1aa" },
   bodyHeading: {
     fontSize: 22,
     fontWeight: "800",

@@ -7,6 +7,7 @@ A tiny, dependency-light **parallax `ScrollView`** for React Native.
 - 🧊 **Body slides over** — the content body scrolls up _on top of_ the header (great for the rounded-sheet look).
 - 🏔️ **Multi-layer depth** — stack `ParallaxLayer`s at different speeds for a layered-scene effect.
 - 🎯 **Scroll-aware overlay** — an `overlay` slot above the scroll content that can read the scroll offset, for fade-in navbars and floating controls.
+- 🌀 **Animated styles everywhere** — `headerStyle` / `bodyStyle` accept Reanimated animated styles, and a `scrollY` prop exposes the offset for screen-level scroll animations (docking bodies, morphing radii…).
 - 🎨 **Fully style-prop driven** — zero opinionated colors. You paint the header and body.
 - 🧵 Runs on the UI thread via [`react-native-reanimated`](https://docs.swmansion.com/react-native-reanimated/). Works on the New Architecture.
 
@@ -93,11 +94,12 @@ export default function Screen() {
 | `headerHeight`          | `number`                              | _auto_  | Fixed header height. Omit / `undefined` / `0` → header sizes to its content. A fixed height enables pull-to-zoom. |
 | `parallaxFactor`        | `number`                              | `0.5`   | Fraction of the body's scroll speed the header moves at, in `[0, 1]`. `1` = header keeps pace with the body (no parallax). `0` = header frozen in place (max parallax). `0.5` = half speed. Out-of-range values are **clamped**. |
 | `headerParallax`        | `boolean`                             | `true`  | Set `false` to stop the header **container** from transforming — for multi-layer scenes where each `ParallaxLayer` owns its own motion. |
-| `headerStyle`           | `StyleProp<ViewStyle>`                | —       | Style for the header container — paint background / border here. |
-| `bodyStyle`             | `StyleProp<ViewStyle>`                | —       | Style for the body wrapper — background, radius, shadow live here. |
+| `headerStyle`           | `StyleProp<AnimatedStyle<ViewStyle>>` | —       | Style for the header container — paint background / border here. Accepts Reanimated animated styles. |
+| `bodyStyle`             | `StyleProp<AnimatedStyle<ViewStyle>>` | —       | Style for the body wrapper — background, radius, shadow live here. Accepts Reanimated animated styles (see the docking recipe). |
 | `contentContainerStyle` | `StyleProp<ViewStyle>`                | —       | Merged into the ScrollView's `contentContainerStyle` (already gets `flexGrow: 1`). |
 | `scrollViewProps`       | `Omit<ScrollViewProps, 'onScroll' \| 'scrollEventThrottle' \| 'contentContainerStyle'>` | — | Any other ScrollView props (e.g. `showsVerticalScrollIndicator`, `refreshControl`). The omitted props are managed internally. |
 | `overlay`               | `ReactNode`                           | —       | Rendered absolutely **above** the scroll content but inside the parallax context — its children can call `useParallaxScroll()`. Container is `pointerEvents="box-none"`, so it never blocks scrolling. Perfect for fade-in navbars. |
+| `scrollY`               | `SharedValue<number>`                 | —       | Optional external shared value mirroring the scroll offset. Pass your own `useSharedValue(0)` to drive scroll-linked animations **outside** the component tree (e.g. an animated `bodyStyle` built at the screen level). Inside `header` / `overlay` / body children, use `useParallaxScroll()` instead. |
 | `ref`                   | `Ref<Animated.ScrollView>`            | —       | Forwarded to the inner `Animated.ScrollView` — call `scrollTo`, `scrollToEnd`, etc. |
 
 ---
@@ -207,6 +209,38 @@ function FadeInBar({ start, end, children }) {
 
 See the `profile`, `product` and `playlist` showcases in the example app for
 complete screens built on this.
+
+### Docking body (scroll-morphing `bodyStyle`)
+
+`bodyStyle` accepts animated styles. Pass your own shared value through the
+`scrollY` prop and the body can morph while it scrolls — here its top radius
+flattens as it docks under the navbar:
+
+```tsx
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
+
+const scrollY = useSharedValue(0);
+const dockStyle = useAnimatedStyle(() => {
+  const radius = interpolate(scrollY.value, [180, 280], [28, 0], Extrapolation.CLAMP);
+  return { borderTopLeftRadius: radius, borderTopRightRadius: radius };
+});
+
+<ParallaxScrollView
+  headerHeight={380}
+  scrollY={scrollY}
+  bodyStyle={[{ backgroundColor: '#fff' }, dockStyle]}
+  header={<Hero />}
+>
+  <Body />
+</ParallaxScrollView>;
+```
+
+The `product` showcase pairs this with a fade-in navbar.
 
 ### Sheet-style body (rounded corners + shadow)
 

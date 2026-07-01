@@ -1,27 +1,33 @@
 import React, { useMemo } from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import { Image } from "expo-image";
 import Svg, {
   Circle,
   Defs,
+  Ellipse,
+  G,
   LinearGradient,
   Path,
+  RadialGradient,
   Rect,
   Stop,
 } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ParallaxLayer, ParallaxScrollView } from "react-native-parallax-flow";
-import { BackButton, bodySheetStyle, Filler } from "../components/Showcase";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import {
+  ParallaxLayer,
+  ParallaxScrollView,
+  useParallaxScroll,
+} from "react-native-parallax-flow";
+import { BackButton, Filler } from "../components/Showcase";
 import { BgPaths } from "../components/mountainPaths";
 
 // Mountains are authored in this space; slice + bottom-anchor them.
 const MTN_VB = "0 0 4000 2000";
 const MTN_FIT = "xMidYMax slice" as const;
-
-const CLOUD_1 =
-  "https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/starry-sky/images/cloud.png";
-const CLOUD_2 =
-  "https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/starry-sky/images/cloud-2.png";
 
 function makeStars(count: number, seedInit: number) {
   let seed = seedInit;
@@ -35,6 +41,43 @@ function makeStars(count: number, seedInit: number) {
     r: rand() * 0.5 + 0.2,
     o: rand() * 0.6 + 0.3,
   }));
+}
+
+/** Soft SVG cloud bank — drawn locally so the scene never depends on remote
+ *  assets. One blurred-looking cluster from stacked ellipses. */
+function CloudBank({ tint = "#ffffff" }: { tint?: string }) {
+  return (
+    <Svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 100 40"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <G fill={tint}>
+        <Ellipse cx="22" cy="18" rx="16" ry="4.5" opacity={0.16} />
+        <Ellipse cx="30" cy="15" rx="10" ry="3" opacity={0.22} />
+        <Ellipse cx="70" cy="26" rx="20" ry="5" opacity={0.14} />
+        <Ellipse cx="78" cy="23" rx="11" ry="3" opacity={0.2} />
+        <Ellipse cx="48" cy="33" rx="14" ry="3.5" opacity={0.12} />
+      </G>
+    </Svg>
+  );
+}
+
+/** "Scroll" hint that fades away as soon as the user starts scrolling. */
+function ScrollHint() {
+  const scrollY = useParallaxScroll();
+  const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
+    const t = interpolate(scrollY.value, [0, 90], [1, 0], Extrapolation.CLAMP);
+    return { opacity: t, transform: [{ translateY: (1 - t) * 14 }] };
+  });
+  return (
+    <Animated.View style={[styles.hint, animatedStyle]}>
+      <Text style={styles.hintText}>scroll</Text>
+      <Text style={styles.hintChevron}>⌄</Text>
+    </Animated.View>
+  );
 }
 
 export default function Layers() {
@@ -52,12 +95,12 @@ export default function Layers() {
         // Each ParallaxLayer owns its own motion → turn off the container's.
         headerParallax={false}
         headerStyle={styles.header}
-        bodyStyle={bodySheetStyle}
+        // The scene continues into a dark body — no white sheet breaking the
+        // night mood; a faint horizon line marks the seam.
+        bodyStyle={styles.body}
         header={
           <View style={styles.scene}>
             {/* Sky gradient — slowest (farthest). */}
-            {/* Title — subtle independent drift. */}
-
             <ParallaxLayer factor={0.04}>
               <Svg
                 width="100%"
@@ -81,7 +124,7 @@ export default function Layers() {
               </Svg>
             </ParallaxLayer>
 
-            {/* Stars — two tints, like #stars-1 / #stars-2. */}
+            {/* Stars — two tints at slightly different depths. */}
             <ParallaxLayer factor={0.1}>
               <Svg
                 width="100%"
@@ -121,29 +164,42 @@ export default function Layers() {
               </Svg>
             </ParallaxLayer>
 
-            {/* Clouds — the original cloud.png / cloud-2.png, at ~40% height. */}
-            <ParallaxLayer factor={0.24} style={styles.cloudLayer}>
-              <Image
-                source={CLOUD_2}
-                style={styles.cloud2}
-                contentFit="fill"
-                transition={300}
-              />
-              <Image
-                source={CLOUD_1}
-                style={styles.cloud1}
-                contentFit="fill"
-                transition={300}
-              />
+            {/* Moon with a soft glow. */}
+            <ParallaxLayer factor={0.16}>
+              <Svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 100 200"
+                preserveAspectRatio="xMidYMin slice"
+              >
+                <Defs>
+                  <RadialGradient id="moonGlow" cx="0.5" cy="0.5" r="0.5">
+                    <Stop offset="0" stopColor="#fff7e0" stopOpacity={0.5} />
+                    <Stop offset="0.5" stopColor="#fff7e0" stopOpacity={0.14} />
+                    <Stop offset="1" stopColor="#fff7e0" stopOpacity={0} />
+                  </RadialGradient>
+                </Defs>
+                <Circle cx="76" cy="34" r="22" fill="url(#moonGlow)" />
+                <Circle cx="76" cy="34" r="6.5" fill="#fdf3d8" />
+                <Circle cx="74" cy="32.5" r="1.4" fill="#e8dcbc" opacity={0.7} />
+                <Circle cx="78.5" cy="36" r="0.9" fill="#e8dcbc" opacity={0.6} />
+              </Svg>
             </ParallaxLayer>
 
+            {/* Clouds — local SVG, no remote assets. */}
+            <ParallaxLayer factor={0.24} style={styles.cloudLayer}>
+              <CloudBank />
+            </ParallaxLayer>
+
+            {/* Title + scroll hint — subtle independent drift. */}
             <ParallaxLayer
               factor={0.35}
               style={{ paddingTop: insets.top + 64 }}
             >
               <View style={styles.titleWrap}>
                 <Text style={styles.kicker}>MULTI-LAYER PARALLAX</Text>
-                <Text style={styles.title}>Scroll Down</Text>
+                <Text style={styles.title}>Night Ridge</Text>
+                <ScrollHint />
               </View>
             </ParallaxLayer>
 
@@ -229,7 +285,9 @@ export default function Layers() {
               </Svg>
             </ParallaxLayer>
 
-            {/* Foreground — layer5 silhouette, fastest (nearest), zooms on pull. */}
+            {/* Foreground — layer5 silhouette, fastest (nearest), zooms on
+                pull. The rect runs to the bottom of the viewBox (y 2000) so no
+                gap shows under the silhouette on tall screens. */}
             <ParallaxLayer
               factor={0.95}
               zoomOnPull
@@ -242,14 +300,14 @@ export default function Layers() {
                 viewBox={MTN_VB}
                 preserveAspectRatio={MTN_FIT}
               >
-                <Rect x="0" y="990" width="4000" height="500" fill="#000000" />
+                <Rect x="0" y="990" width="4000" height="1010" fill="#000000" />
                 <Path d={BgPaths.layer5} fill="#000000" />
               </Svg>
             </ParallaxLayer>
           </View>
         }
       >
-        <Filler count={12} />
+        <Filler dark count={12} />
       </ParallaxScrollView>
     </View>
   );
@@ -258,32 +316,40 @@ export default function Layers() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#000010" },
   header: { backgroundColor: "#000010" },
+  body: {
+    backgroundColor: "#0b0a16",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,153,85,0.35)",
+  },
   scene: { flex: 1 },
   // Mountains occupy the bottom band of the tall header, sitting right above
   // the body. Sky/stars stay full-height behind them. Shared offset so all
   // mountain layers stay aligned as one scene.
   mtnBand: { top: "38%" },
-  cloudLayer: { top: "20%", opacity: 0.4 },
-  cloud1: {
-    position: "absolute",
-    right: -20,
-    top: 0,
-    width: "85%",
-    height: 120,
-  },
-  cloud2: {
-    position: "absolute",
-    left: -40,
-    top: 30,
-    width: "95%",
-    height: 150,
-  },
+  cloudLayer: { top: "18%", height: "22%" },
   titleWrap: { alignItems: "center", gap: 6 },
   kicker: {
     color: "#ffd9a8",
     fontSize: 11,
     fontWeight: "700",
-    letterSpacing: 2,
+    letterSpacing: 3,
   },
-  title: { color: "#ffffff", fontSize: 40, fontWeight: "900" },
+  title: {
+    color: "#ffffff",
+    fontSize: 42,
+    fontWeight: "900",
+    letterSpacing: 0.5,
+    textShadowColor: "rgba(255,153,85,0.35)",
+    textShadowRadius: 18,
+    textShadowOffset: { width: 0, height: 0 },
+  },
+  hint: { alignItems: "center", marginTop: 14, gap: -6 },
+  hintText: {
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+  },
+  hintChevron: { color: "rgba(255,255,255,0.55)", fontSize: 22 },
 });

@@ -145,7 +145,13 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   artwork: { width: 216, height: 216, borderRadius: 10 },
-  bodySheet: { backgroundColor: "#0f0f14" },
+  bodySheet: {
+    backgroundColor: "#16121f",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(139,92,246,0.45)",
+  },
 
   bar: {
     alignItems: "center",

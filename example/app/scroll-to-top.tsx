@@ -2,7 +2,7 @@ import React, { useRef, type ComponentRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ParallaxScrollView } from 'react-native-parallax-flow';
-import { BackButton, bodySheetStyle, Filler } from '../components/Showcase';
+import { BackButton, Filler } from '../components/Showcase';
 
 export default function ScrollToTop() {
   const insets = useSafeAreaInsets();
@@ -18,7 +18,8 @@ export default function ScrollToTop() {
         ref={scrollRef}
         headerHeight={240}
         headerStyle={styles.header}
-        bodyStyle={bodySheetStyle}
+        // Warm paper body with a heavy single-side accent border.
+        bodyStyle={styles.body}
         header={
           <View style={[styles.center, { paddingTop: insets.top }]}>
             <Text style={styles.title}>forwardRef</Text>
@@ -44,6 +45,13 @@ export default function ScrollToTop() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#b45309' },
   header: { backgroundColor: '#b45309' },
+  body: {
+    backgroundColor: '#fffbeb',
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    borderTopWidth: 4,
+    borderTopColor: '#f59e0b',
+  },
   center: {
     flex: 1,
     alignItems: 'center',

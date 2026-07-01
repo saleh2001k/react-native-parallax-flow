@@ -11,6 +11,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   LinearTransition,
+  type AnimatedStyle,
+  type SharedValue,
 } from 'react-native-reanimated';
 import { ParallaxScrollContext } from './ParallaxContext';
 
@@ -38,10 +40,18 @@ export type ParallaxScrollViewProps = {
    * Defaults to `true`.
    */
   headerParallax?: boolean;
-  /** Style for the header container (paint background, border, etc. here). */
-  headerStyle?: StyleProp<ViewStyle>;
-  /** Style for the body wrapper (background, radius, shadow live here). */
-  bodyStyle?: StyleProp<ViewStyle>;
+  /**
+   * Style for the header container (paint background, border, etc. here).
+   * Accepts Reanimated animated styles too.
+   */
+  headerStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
+  /**
+   * Style for the body wrapper (background, radius, shadow live here).
+   * Accepts Reanimated animated styles — combine with the `scrollY` prop to
+   * morph the body as it scrolls (e.g. flatten its top radius as it docks
+   * under a navbar).
+   */
+  bodyStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
   /** Extra style merged into the ScrollView's contentContainerStyle. */
   contentContainerStyle?: StyleProp<ViewStyle>;
   /**
@@ -60,6 +70,14 @@ export type ParallaxScrollViewProps = {
    * scrolling; only its children receive touches.
    */
   overlay?: ReactNode;
+  /**
+   * Optional external shared value mirroring the scroll offset (px). Pass your
+   * own `useSharedValue(0)` when you need scroll-linked animations *outside*
+   * the component tree — e.g. an animated `bodyStyle` or `headerStyle` built
+   * at the screen level. Inside `header` / `overlay` / body children, prefer
+   * `useParallaxScroll()` instead.
+   */
+  scrollY?: SharedValue<number>;
   children: ReactNode;
 };
 
@@ -85,11 +103,13 @@ export const ParallaxScrollView = forwardRef<
     contentContainerStyle,
     scrollViewProps,
     overlay,
+    scrollY: externalScrollY,
     children,
   },
   ref,
 ) {
-  const scrollY = useSharedValue(0);
+  const internalScrollY = useSharedValue(0);
+  const scrollY = externalScrollY ?? internalScrollY;
 
   // Normalize props to plain primitives so the worklets close over stable
   // values (and to harden against bad input).

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ParallaxScrollView } from 'react-native-parallax-flow';
-import { BackButton, bodySheetStyle } from '../components/Showcase';
+import { BackButton } from '../components/Showcase';
 
 type Case = 'factor0' | 'factor1' | 'short' | 'emptyHeader';
 
@@ -35,7 +35,7 @@ export default function EdgeCases() {
         headerHeight={active === 'emptyHeader' ? 0 : 200}
         parallaxFactor={factor}
         headerStyle={styles.header}
-        bodyStyle={bodySheetStyle}
+        bodyStyle={styles.body}
         header={header}
       >
         <View style={styles.bodyContent}>
@@ -90,6 +90,11 @@ function describe(c: Case): string {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#be123c' },
   header: { backgroundColor: '#be123c' },
+  body: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
   headerInner: { paddingHorizontal: 24, paddingBottom: 24, gap: 6 },
   title: { color: '#ffffff', fontSize: 28, fontWeight: '800' },
   subtitle: { color: '#fecdd3', fontSize: 14, lineHeight: 20 },

@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 import { ParallaxScrollView } from "react-native-parallax-flow";
 import { BackButton, FadeInBar } from "../components/Showcase";
 
@@ -30,12 +36,28 @@ export default function Product() {
   const [color, setColor] = useState("crimson");
   const [size, setSize] = useState("42");
 
+  // Docking animation: mirror the scroll offset through the `scrollY` prop and
+  // flatten the body's top radius as it slides under the navbar, so the sheet
+  // "docks" into a full-width page.
+  const scrollY = useSharedValue(0);
+  const dockStyle = useAnimatedStyle(() => {
+    "worklet";
+    const radius = interpolate(
+      scrollY.value,
+      [HEADER_HEIGHT - barHeight - 90, HEADER_HEIGHT - barHeight],
+      [28, 0],
+      Extrapolation.CLAMP,
+    );
+    return { borderTopLeftRadius: radius, borderTopRightRadius: radius };
+  });
+
   return (
     <View style={styles.root}>
       <ParallaxScrollView
         headerHeight={HEADER_HEIGHT}
         parallaxFactor={0.55}
-        bodyStyle={styles.bodySheet}
+        scrollY={scrollY}
+        bodyStyle={[styles.bodySheet, dockStyle]}
         header={
           <View style={styles.headerWrap}>
             <Image
@@ -144,10 +166,9 @@ export default function Product() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#e7e5e4" },
   headerWrap: { flex: 1 },
+  // Top radius is animated (see dockStyle); only paint the surface here.
   bodySheet: {
     backgroundColor: "#ffffff",
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
   },
 
   bar: {

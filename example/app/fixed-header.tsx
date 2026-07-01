@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ParallaxScrollView } from 'react-native-parallax-flow';
-import { BackButton, bodySheetStyle, Filler } from '../components/Showcase';
+import { BackButton, Filler, SheetHandle } from '../components/Showcase';
 
 const HEADER_HEIGHT = 280;
 
@@ -15,7 +15,8 @@ export default function FixedHeader() {
         headerHeight={HEADER_HEIGHT}
         parallaxFactor={0.5}
         headerStyle={styles.header}
-        bodyStyle={bodySheetStyle}
+        // Bottom-sheet body: tight radius + grab handle.
+        bodyStyle={styles.body}
         header={
           <View style={[styles.center, { paddingTop: insets.top }]}>
             <View style={styles.badge}>
@@ -29,6 +30,7 @@ export default function FixedHeader() {
           </View>
         }
       >
+        <SheetHandle />
         <Filler count={10} />
       </ParallaxScrollView>
     </View>
@@ -38,6 +40,16 @@ export default function FixedHeader() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0f766e' },
   header: { backgroundColor: '#0f766e' },
+  body: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.14,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -3 },
+    elevation: 8,
+  },
   center: {
     flex: 1,
     alignItems: 'center',

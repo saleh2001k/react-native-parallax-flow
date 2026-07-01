@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ParallaxScrollView } from 'react-native-parallax-flow';
-import { BackButton, bodySheetStyle, Filler } from '../components/Showcase';
+import { BackButton, Filler } from '../components/Showcase';
 
 const FACTORS = [0, 0.25, 0.5, 0.75, 1];
 
@@ -20,7 +20,8 @@ export default function Playground() {
         headerHeight={fixed ? 260 : undefined}
         parallaxFactor={factor}
         headerStyle={styles.header}
-        bodyStyle={bodySheetStyle}
+        // Asymmetric radius — one swept corner, editorial look.
+        bodyStyle={styles.body}
         header={
           <View style={[styles.headerInner, { paddingTop: insets.top + 52 }]}>
             <Text style={styles.title}>Playground</Text>
@@ -81,6 +82,11 @@ export default function Playground() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#7c3aed' },
   header: { backgroundColor: '#7c3aed' },
+  body: {
+    backgroundColor: '#faf5ff',
+    borderTopLeftRadius: 48,
+    borderTopRightRadius: 0,
+  },
   headerInner: { paddingHorizontal: 24, paddingBottom: 28, gap: 6 },
   title: { color: '#ffffff', fontSize: 28, fontWeight: '800' },
   subtitle: { color: '#ddd6fe', fontSize: 14 },

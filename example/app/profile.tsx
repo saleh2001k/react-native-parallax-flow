@@ -2,7 +2,15 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ParallaxScrollView } from "react-native-parallax-flow";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import {
+  ParallaxScrollView,
+  useParallaxScroll,
+} from "react-native-parallax-flow";
 import { BackButton, FadeInBar } from "../components/Showcase";
 
 const HEADER_HEIGHT = 300;
@@ -20,6 +28,28 @@ const STATS = [
 const GRID = Array.from({ length: 12 }).map(
   (_, i) => `https://picsum.photos/seed/pf${i}/400/400`,
 );
+
+/** Cover scrim that darkens as you scroll — keeps the header legible while
+ *  the fade-in bar takes over. Reads the offset from the parallax context. */
+function DarkeningScrim() {
+  const scrollY = useParallaxScroll();
+  const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
+    const opacity = interpolate(
+      scrollY.value,
+      [0, HEADER_HEIGHT * 0.7],
+      [0.25, 0.6],
+      Extrapolation.CLAMP,
+    );
+    return { backgroundColor: `rgba(2,6,23,${opacity})` };
+  });
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[StyleSheet.absoluteFill, animatedStyle]}
+    />
+  );
+}
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
@@ -39,7 +69,7 @@ export default function Profile() {
               contentFit="cover"
               transition={300}
             />
-            <View style={styles.scrim} />
+            <DarkeningScrim />
           </View>
         }
         overlay={
@@ -100,10 +130,6 @@ export default function Profile() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#0f172a" },
   headerWrap: { flex: 1 },
-  scrim: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(2,6,23,0.25)",
-  },
   bodySheet: {
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 28,
