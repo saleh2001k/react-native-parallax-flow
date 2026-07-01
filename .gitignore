@@ -1,0 +1,7 @@
+node_modules/
+lib/
+*.log
+.DS_Store
+
+# local design-reference scratch (raw CodePen source, not part of the package)
+layerEg.md
