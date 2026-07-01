@@ -87,7 +87,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 48,
     borderTopRightRadius: 0,
   },
-  headerInner: { paddingHorizontal: 24, paddingBottom: 28, gap: 6 },
+  // Extra bottom padding: the body overlaps the header by its 48px corner
+  // radius, so keep the controls clear of the covered strip.
+  headerInner: { paddingHorizontal: 24, paddingBottom: 60, gap: 6 },
   title: { color: '#ffffff', fontSize: 28, fontWeight: '800' },
   subtitle: { color: '#ddd6fe', fontSize: 14 },
   controls: { marginTop: 16, gap: 8 },

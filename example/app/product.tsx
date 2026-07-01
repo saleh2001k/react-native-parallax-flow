@@ -58,6 +58,9 @@ export default function Product() {
         parallaxFactor={0.55}
         scrollY={scrollY}
         bodyStyle={[styles.bodySheet, dockStyle]}
+        // Radius lives in the animated style, so the auto-derive can't see
+        // it — overlap the hero by the resting radius explicitly.
+        bodyOverlap={28}
         header={
           <View style={styles.headerWrap}>
             <Image

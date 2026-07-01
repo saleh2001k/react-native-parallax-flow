@@ -30,6 +30,18 @@ function extractBackgroundColor(
   return typeof bg === 'string' || typeof bg === 'number' ? bg : undefined;
 }
 
+/** Largest top corner radius found in a (possibly animated) body style. */
+function extractTopRadius(style: StyleProp<AnimatedStyle<ViewStyle>>): number {
+  const flat = StyleSheet.flatten(style as StyleProp<ViewStyle>);
+  if (!flat) return 0;
+  const base = typeof flat.borderRadius === 'number' ? flat.borderRadius : 0;
+  const tl =
+    typeof flat.borderTopLeftRadius === 'number' ? flat.borderTopLeftRadius : base;
+  const tr =
+    typeof flat.borderTopRightRadius === 'number' ? flat.borderTopRightRadius : base;
+  return Math.max(tl, tr, 0);
+}
+
 export type ParallaxScrollViewProps = {
   /** Content rendered inside the parallax header region. */
   header: ReactNode;
@@ -91,6 +103,15 @@ export type ParallaxScrollViewProps = {
    */
   scrollY?: SharedValue<number>;
   /**
+   * How many px the body overlaps (slides up over) the bottom of the header.
+   * With rounded body corners, the corner cutouts then reveal the header's
+   * content — an image, a gradient — instead of the screen background peeking
+   * through at rest. Defaults to the largest top corner radius found in a
+   * static `bodyStyle`. Pass `0` to disable, or a custom value for
+   * non-radius cutouts (e.g. a zig-zag body edge).
+   */
+  bodyOverlap?: number;
+  /**
    * Color painted beneath the body for the bottom over-scroll (bounce) region.
    * On iOS, rubber-banding past the bottom reveals whatever sits behind the
    * scroll content — usually the screen background, which flashes a mismatched
@@ -125,6 +146,7 @@ export const ParallaxScrollView = forwardRef<
     scrollViewProps,
     overlay,
     scrollY: externalScrollY,
+    bodyOverlap,
     bounceColor,
     children,
   },
@@ -141,6 +163,9 @@ export const ParallaxScrollView = forwardRef<
   const factor = Math.min(1, Math.max(0, parallaxFactor));
 
   const resolvedBounceColor = bounceColor ?? extractBackgroundColor(bodyStyle);
+  // No header → nothing to overlap; a negative margin would clip the body top.
+  const resolvedOverlap =
+    header == null ? 0 : Math.max(0, bodyOverlap ?? extractTopRadius(bodyStyle));
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
@@ -199,8 +224,18 @@ export const ParallaxScrollView = forwardRef<
             {header}
           </Animated.View>
 
-          {/* Body rendered after header → higher z-order, slides over header. */}
-          <Animated.View layout={LinearTransition} style={[styles.body, bodyStyle]}>
+          {/* Body rendered after header → higher z-order, slides over header.
+              The negative margin tucks the body over the header's bottom edge
+              so rounded corners reveal the header content, not the screen
+              background. */}
+          <Animated.View
+            layout={LinearTransition}
+            style={[
+              styles.body,
+              resolvedOverlap > 0 ? { marginTop: -resolvedOverlap } : null,
+              bodyStyle,
+            ]}
+          >
             {/* Bounce tail: extends the body surface below the content so the
                 iOS bottom rubber-band shows this color instead of whatever is
                 behind the ScrollView. Purely cosmetic — never intercepts

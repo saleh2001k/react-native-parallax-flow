@@ -49,6 +49,24 @@ const ITEMS: Item[] = [
     subtitle: 'Food hero, blur fade-in bar, sectioned menu',
   },
   {
+    href: '/space',
+    tag: 'crazy',
+    title: 'Solar system',
+    subtitle: 'Saturn in layered deep space — planet zooms on pull',
+  },
+  {
+    href: '/magazine',
+    tag: 'crazy',
+    title: 'Magazine cover',
+    subtitle: 'Every cover element is its own parallax layer',
+  },
+  {
+    href: '/boarding-pass',
+    tag: 'crazy',
+    title: 'Boarding pass',
+    subtitle: 'Perforated ticket edge — sky shows through the teeth',
+  },
+  {
     href: '/content-header',
     tag: 'basics',
     title: 'Auto-height header',

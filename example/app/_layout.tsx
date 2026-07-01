@@ -57,6 +57,18 @@ export default function RootLayout() {
             options={{ title: 'Restaurant menu', headerShown: false }}
           />
           <Stack.Screen
+            name="space"
+            options={{ title: 'Solar system', headerShown: false }}
+          />
+          <Stack.Screen
+            name="magazine"
+            options={{ title: 'Magazine cover', headerShown: false }}
+          />
+          <Stack.Screen
+            name="boarding-pass"
+            options={{ title: 'Boarding pass', headerShown: false }}
+          />
+          <Stack.Screen
             name="playground"
             options={{ title: 'Playground', headerShown: false }}
           />
