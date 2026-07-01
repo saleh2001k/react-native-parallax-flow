@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { VideoView, useVideoPlayer } from "expo-video";
+import { VideoView, useVideoPlayer, type VideoPlayer } from "expo-video";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
@@ -23,9 +23,10 @@ import {
 import { FadeInBar, FadeOutView } from "../components/Showcase";
 
 const HEADER_HEIGHT = 440;
-// Muted looping stock clip standing in for artist footage.
-const VIDEO_URL =
-  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4";
+// Local muted looping clip standing in for artist footage. 720p re-encode of
+// the 4K original — decoding 4K while the header transforms every scroll
+// frame makes iOS drop/flash frames, and 97 MB is too heavy for the repo.
+const VIDEO = require("../assests/artist-hero.mp4");
 
 const SONGS = [
   { title: "Neon Skyline", plays: "1.2B", duration: "3:42", liked: true },
@@ -81,6 +82,37 @@ function ShrinkingTitle({ children }: { children: string }) {
   );
 }
 
+/** Memoized so screen state changes (tabs, follow) never re-render the
+ *  native video view — re-renders make AVPlayerLayer flash on iOS. */
+const VideoHero = React.memo(function VideoHero({
+  player,
+}: {
+  player: VideoPlayer;
+}) {
+  return (
+    <>
+      <VideoView
+        player={player}
+        style={StyleSheet.absoluteFill}
+        contentFit="cover"
+        nativeControls={false}
+      />
+      {/* Bottom gradient so the title always reads over the footage. */}
+      <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
+        <Defs>
+          <LinearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#000000" stopOpacity={0.25} />
+            <Stop offset="0.45" stopColor="#000000" stopOpacity={0} />
+            <Stop offset="0.72" stopColor="#000000" stopOpacity={0.35} />
+            <Stop offset="1" stopColor="#000000" stopOpacity={0.96} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#fade)" />
+      </Svg>
+    </>
+  );
+});
+
 function IconChip({ glyph, onPress }: { glyph: string; onPress?: () => void }) {
   return (
     <Pressable
@@ -101,7 +133,7 @@ export default function Artist() {
   const [tab, setTab] = useState<Tab>("songs");
   const [following, setFollowing] = useState(false);
 
-  const player = useVideoPlayer(VIDEO_URL, p => {
+  const player = useVideoPlayer(VIDEO, p => {
     p.loop = true;
     p.muted = true;
     p.play();
@@ -116,24 +148,7 @@ export default function Artist() {
         scrollViewProps={{ showsVerticalScrollIndicator: false }}
         header={
           <View style={styles.headerWrap}>
-            <VideoView
-              player={player}
-              style={StyleSheet.absoluteFill}
-              contentFit="cover"
-              nativeControls={false}
-            />
-            {/* Bottom gradient so the title always reads over the footage. */}
-            <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
-              <Defs>
-                <LinearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0" stopColor="#000000" stopOpacity={0.25} />
-                  <Stop offset="0.45" stopColor="#000000" stopOpacity={0} />
-                  <Stop offset="0.72" stopColor="#000000" stopOpacity={0.35} />
-                  <Stop offset="1" stopColor="#000000" stopOpacity={0.96} />
-                </LinearGradient>
-              </Defs>
-              <Rect x="0" y="0" width="100%" height="100%" fill="url(#fade)" />
-            </Svg>
+            <VideoHero player={player} />
             <View style={styles.titleSlot}>
               <ShrinkingTitle>VIOLET MOTORS</ShrinkingTitle>
             </View>

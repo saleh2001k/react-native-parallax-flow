@@ -21,11 +21,19 @@ const ARTWORK =
 const TRACKS = [
   { title: "Neon Skyline", artist: "Violet Motors", duration: "3:42" },
   { title: "Midnight Drive", artist: "Violet Motors", duration: "4:05" },
-  { title: "Chrome Hearts", artist: "Violet Motors ft. Lumen", duration: "3:18" },
+  {
+    title: "Chrome Hearts",
+    artist: "Violet Motors ft. Lumen",
+    duration: "3:18",
+  },
   { title: "Afterglow", artist: "Violet Motors", duration: "5:01" },
   { title: "Static Bloom", artist: "Violet Motors", duration: "2:56" },
   { title: "Coastline", artist: "Violet Motors", duration: "3:37" },
-  { title: "Glass City", artist: "Violet Motors ft. Aria Vale", duration: "4:22" },
+  {
+    title: "Glass City",
+    artist: "Violet Motors ft. Aria Vale",
+    duration: "4:22",
+  },
   { title: "Slow Motion", artist: "Violet Motors", duration: "3:49" },
   { title: "Polaris", artist: "Violet Motors", duration: "4:44" },
   { title: "Night Swim", artist: "Violet Motors", duration: "3:11" },
@@ -48,7 +56,12 @@ function Artwork() {
   });
   return (
     <Animated.View style={[styles.artworkWrap, animatedStyle]}>
-      <Image source={ARTWORK} style={styles.artwork} contentFit="cover" transition={300} />
+      <Image
+        source={ARTWORK}
+        style={styles.artwork}
+        contentFit="cover"
+        transition={300}
+      />
     </Animated.View>
   );
 }
@@ -75,7 +88,9 @@ export default function Playlist() {
               </Defs>
               <Rect x="0" y="0" width="100%" height="100%" fill="url(#bg)" />
             </Svg>
-            <View style={[styles.artworkCenter, { paddingTop: insets.top + 24 }]}>
+            <View
+              style={[styles.artworkCenter, { paddingTop: insets.top + 24 }]}
+            >
               <Artwork />
             </View>
           </View>
@@ -85,7 +100,10 @@ export default function Playlist() {
             <FadeInBar
               start={HEADER_HEIGHT - barHeight - 110}
               end={HEADER_HEIGHT - barHeight - 20}
-              style={[styles.bar, { height: barHeight, paddingTop: insets.top }]}
+              style={[
+                styles.bar,
+                { height: barHeight, paddingTop: insets.top },
+              ]}
             >
               <Text style={styles.barTitle} numberOfLines={1}>
                 Midnight Drive — Violet Motors
@@ -149,8 +167,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#16121f",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(139,92,246,0.45)",
   },
 
   bar: {
@@ -167,7 +183,12 @@ const styles = StyleSheet.create({
   albumTitle: { color: "#fafafa", fontSize: 26, fontWeight: "800" },
   albumArtist: { color: "#d4d4d8", fontSize: 15, fontWeight: "600" },
   albumMeta: { color: "#71717a", fontSize: 12, marginTop: 2 },
-  controls: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14 },
+  controls: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 14,
+  },
   playBtn: {
     backgroundColor: "#8b5cf6",
     paddingHorizontal: 30,
@@ -192,9 +213,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 11,
   },
-  trackIndex: { width: 22, textAlign: "center", color: "#71717a", fontSize: 14 },
+  trackIndex: {
+    width: 22,
+    textAlign: "center",
+    color: "#71717a",
+    fontSize: 14,
+  },
   trackMain: { flex: 1, gap: 2 },
   trackTitle: { color: "#fafafa", fontSize: 15, fontWeight: "600" },
   trackArtist: { color: "#71717a", fontSize: 12 },
-  trackDuration: { color: "#71717a", fontSize: 13, fontVariant: ["tabular-nums"] },
+  trackDuration: {
+    color: "#71717a",
+    fontSize: 13,
+    fontVariant: ["tabular-nums"],
+  },
 });

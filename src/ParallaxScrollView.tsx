@@ -203,11 +203,14 @@ export const ParallaxScrollView = forwardRef<
   return (
     <ParallaxScrollContext.Provider value={scrollY}>
       <View style={styles.container}>
+        {/* No layout transition on the ScrollView itself: on iOS a layout
+            animation snapshots the container — including native video layers
+            in the header — which makes them flash. The body below keeps its
+            transition for smooth height changes. */}
         <Animated.ScrollView
           ref={ref}
           {...scrollViewProps}
           onScroll={scrollHandler}
-          layout={LinearTransition}
           scrollEventThrottle={16}
           contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
         >

@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local-only source videos (too big for the repo — the committed
+# artist-hero.mp4 is the 720p re-encode the app actually uses)
+/assests/15902522_3840_2160_25fps.mp4
+/assests/artist-hero-1080.mp4

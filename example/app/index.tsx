@@ -11,13 +11,10 @@ import Svg, {
   Stop,
 } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  ParallaxLayer,
-  ParallaxScrollView,
-} from "react-native-parallax-flow";
+import { ParallaxLayer, ParallaxScrollView } from "react-native-parallax-flow";
 import { FadeInBar } from "../components/Showcase";
 
-const HEADER_HEIGHT = 290;
+const HEADER_HEIGHT = 350;
 
 interface Item {
   href: Href;
@@ -35,8 +32,7 @@ interface Section {
   items: Item[];
 }
 
-const unsplash = (id: string) =>
-  `https://images.unsplash.com/${id}?w=500&q=70`;
+const unsplash = (id: string) => `https://images.unsplash.com/${id}?w=500&q=70`;
 
 const SECTIONS: Section[] = [
   {
@@ -212,12 +208,22 @@ export default function Home() {
                 <Defs>
                   <RadialGradient id="glow" cx="0.85" cy="0.15" r="0.9">
                     <Stop offset="0" stopColor="#6d28d9" stopOpacity={0.5} />
-                    <Stop offset="0.55" stopColor="#312e81" stopOpacity={0.18} />
+                    <Stop
+                      offset="0.55"
+                      stopColor="#312e81"
+                      stopOpacity={0.18}
+                    />
                     <Stop offset="1" stopColor="#0b0c10" stopOpacity={0} />
                   </RadialGradient>
                 </Defs>
                 <Rect x="0" y="0" width="100%" height="100%" fill="#0b0c10" />
-                <Rect x="0" y="0" width="100%" height="100%" fill="url(#glow)" />
+                <Rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="100%"
+                  fill="url(#glow)"
+                />
               </Svg>
             </ParallaxLayer>
 
@@ -252,7 +258,7 @@ export default function Home() {
           </FadeInBar>
         }
       >
-        {SECTIONS.map(section => (
+        {SECTIONS.map((section) => (
           <View key={section.index} style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIndex}>{section.index}</Text>
@@ -261,7 +267,7 @@ export default function Home() {
             </View>
 
             <View style={styles.grid}>
-              {section.items.map(item => (
+              {section.items.map((item) => (
                 <View key={String(item.href)} style={styles.cell}>
                   <Link href={item.href} asChild>
                     <Pressable
@@ -344,8 +350,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f1117",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.07)",
   },
 
   bar: {
